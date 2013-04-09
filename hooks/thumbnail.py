@@ -11,7 +11,7 @@ class ThumbnailHook(Hook):
     Hook that can be used to provide a pre-defined thumbnail
     for the snapshot
     """
-    def execute(self, engine_name, **kwargs):
+    def execute(self, **kwargs):
         """
         Main hook entry point
         
