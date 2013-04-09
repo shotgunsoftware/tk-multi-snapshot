@@ -224,7 +224,7 @@ class Snapshot(object):
             return
         
         # get initial thumbnail if there is one:
-        thumbnail = QtGui.QPixmap(self._app.execute_hook("hook_thumbnail", engine_name=self._app.engine.name))
+        thumbnail = QtGui.QPixmap(self._app.execute_hook("hook_thumbnail"))
         
         # show snapshot dialog as modal dialog:
         from .snapshot_form import SnapshotForm

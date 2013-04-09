@@ -8,15 +8,12 @@ from tank import Hook
 
 class ThumbnailHook(Hook):
     """
-    Hook to scan scene for items to publish
+    Hook that can be used to provide a pre-defined thumbnail
+    for the snapshot
     """
     def execute(self, engine_name, **kwargs):
         """
         Main hook entry point
-        
-        :engine_name:   String
-                        The name of the engine the app is currently running
-                        in
         
         :return:        String
                         Hook should return a file path pointing to the location of
@@ -24,6 +21,8 @@ class ThumbnailHook(Hook):
                         If the hook returns None then the screenshot functionality
                         will be enabled in the UI.
         """
+        # Note: the engine name can be accessed from the hook's parent:
+        # engine_name = self.parent.engine.name
         
         # default implementation does nothing
         return None
