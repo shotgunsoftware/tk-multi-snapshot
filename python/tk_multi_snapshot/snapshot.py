@@ -205,20 +205,20 @@ class Snapshot(object):
         Perform a snapshot of the current work file with the help of the UI
         """
       
-        # save current work file and get path:
+        # get current work file path:
         try:
             work_file_path = self.get_current_file_path()
         except Exception, e:
-            msg = ("Failed to save the current work file due to the following reason:\n\n"
-                  "    %s\n\n"
+            msg = ("Failed to get the current work file path due to the following reason:\n\n"
+                  "%s\n\n"
                   "Unable to continue!" % e)
             QtGui.QMessageBox.critical(None, "Snapshot Error!", msg)
             return
         
         # current scene path must match work template and contain version:
-        if not self._work_template.validate(work_file_path):
-            # (AD) - need to hook this up to workfiles
-            msg = ("Current scene is not a valid work file!  Please save as a\n"
+        if not work_file_path or not self._work_template.validate(work_file_path):
+            # TODO: need to hook this up to workfiles
+            msg = ("Current scene is not a valid work file!  Please save as a "
                    "work file to continue")
             QtGui.QMessageBox.critical(None, "Unable To Snapshot!", msg)
             return
