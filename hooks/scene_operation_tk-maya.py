@@ -8,6 +8,7 @@ import maya.cmds as cmds
 
 import tank
 from tank import Hook
+from tank import TankError
 
 class SceneOperation(Hook):
     """
@@ -44,4 +45,4 @@ class SceneOperation(Hook):
             # save the current scene:
             cmds.file(save=True)
         else:
-            raise Exception("Don't know how to perform scene operation '%s'" % operation)
+            raise TankError("Don't know how to perform scene operation '%s'" % operation)
