@@ -228,8 +228,7 @@ class Snapshot(object):
         
         # show snapshot dialog as modal dialog:
         from .snapshot_form import SnapshotForm
-        title = self._app.get_setting("snapshot_display_name")
-        (res, snapshot_widget) = self._app.engine.show_modal(title, self._app, SnapshotForm, work_file_path, thumbnail, self._setup_snapshot_ui)
+        (res, snapshot_widget) = self._app.engine.show_modal("Snapshot", self._app, SnapshotForm, work_file_path, thumbnail, self._setup_snapshot_ui)
       
         # special case return code to show history dialog:
         if res == SnapshotForm.SHOW_HISTORY_RETURN_CODE:
@@ -268,11 +267,10 @@ class Snapshot(object):
         """
         Show the snapshot history UI for the current path
         """
-        title = self._app.get_setting("snapshot_history_display_name")
         
         # create dialog and hook up signals:
         from .snapshot_history_form import SnapshotHistoryForm
-        self._snapshot_history_ui = self._app.engine.show_dialog(title, self._app, SnapshotHistoryForm, self._app, self)
+        self._snapshot_history_ui = self._app.engine.show_dialog("Snapshot History", self._app, SnapshotHistoryForm, self._app, self)
         
         self._snapshot_history_ui.restore.connect(self._on_history_restore_snapshot)
         self._snapshot_history_ui.snapshot.connect(self._on_history_do_snapshot)

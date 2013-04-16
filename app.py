@@ -30,13 +30,11 @@ class MultiSnapshot(tank.platform.Application):
             return
       
         # register commands:
-        cmd_name = self.get_setting("snapshot_display_name")
         cmd = lambda app=self: tk_multi_snapshot.Snapshot.show_snapshot_dlg(app)
-        self.engine.register_command("%s..." % cmd_name, cmd)
+        self.engine.register_command("Snapshot...", cmd)
         
-        cmd_name = self.get_setting("snapshot_history_display_name")
         cmd = lambda app=self: tk_multi_snapshot.Snapshot.show_snapshot_history_dlg(app)
-        self.engine.register_command("%s..." % cmd_name, cmd)
+        self.engine.register_command("Snapshot History...", cmd)
         
     def destroy_app(self):
         self.log_debug("Destroying tk-multi-snapshot")
