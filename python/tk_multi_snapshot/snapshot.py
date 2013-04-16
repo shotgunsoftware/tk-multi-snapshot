@@ -303,10 +303,14 @@ class Snapshot(object):
         """
         try:
             self.restore_snapshot(snapshot_path)
-        except:
-            raise
+        except TankError, e:
+            QtGui.QMessageBox.critical(None, "Snapshot Restore Failed!", e)
+            return
+        except Exception, e:
+            self._app.log_exception("Snapshot Restore Failed!")
+            return
         
-        self._snapshot_history_ui.refresh()
+        self._snapshot_history_ui.close()
         
     def _on_history_do_snapshot(self):
         """
