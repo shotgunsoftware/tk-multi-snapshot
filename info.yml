@@ -25,7 +25,8 @@ configuration:
         type: hook
         parameters: [operation, file_path]
         default_value: "scene_operation_{engine_name}"
-        description:    
+        description: All the application specific scene operations (open, save etc) that 
+                     the app needs to carry out are collected in this hook.
         
     hook_copy_file:
         type: hook
@@ -34,38 +35,29 @@ configuration:
         description: Specify a hook that will be used to copy the file 'source_path' 
                      to 'target_path'.
     
-    # snapshot settings
-    snapshot_display_name:
-        type: str
-        default_value: Snapshot Work File
-        description:
-        
     hook_thumbnail:
         type: hook
         parameters: []
         default_value: thumbnail
         description: Specify a hook to pre-generate a thumbnail for the snapshot.
-
-    # snapshot history settings: 
-    snapshot_history_display_name:
-        type: str
-        default_value: Work File Snapshot History
         
             
 # the Shotgun fields that this app needs in order to operate correctly
 requires_shotgun_fields:
 
 # More verbose description of this item 
-display_name: "Snapshot"
-description: "File snapshot functionality."
+display_name: "Scene Snapshot"
+description: This app lets you quickly take a snapshot of the scene that you are working
+             on - essentially a quick, personal backup. You can also browse your history and
+             restore old snapshots. 
 
 # Required minimum versions for this item to run
 requires_shotgun_version:
 requires_core_version: "v0.12.21"
 requires_engine_version: 
 
-# the engines that this app can operate in:
-supported_engines: [tk-nuke, tk-maya]
+# this app works in all engines - it does not contain any host application specific commands
+supported_engines: 
 
 # the frameworks required to run this app
 frameworks:
