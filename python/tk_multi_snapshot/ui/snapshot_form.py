@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'snapshot_form.ui'
 #
-# Created: Sun Apr  7 11:47:41 2013
+# Created: Tue Apr 16 16:55:26 2013
 #      by: pyside-uic 0.2.13 running on PySide 1.1.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -60,15 +60,17 @@ class Ui_SnapshotForm(object):
         self.thumbnail_frame.setMinimumSize(QtCore.QSize(200, 120))
         self.thumbnail_frame.setMaximumSize(QtCore.QSize(200, 120))
         self.thumbnail_frame.setStyleSheet("#thumbnail_frame {\n"
-"border-style: Solid;\n"
+"border-style: solid;\n"
+"border-color: rgb(32,32,32);\n"
+"border-width: 1px;\n"
 "border-radius: 3px;\n"
-"background: rgb(32,32,32);\n"
+"background: rgb(117,117,117);\n"
 "}")
         self.thumbnail_frame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.thumbnail_frame.setFrameShadow(QtGui.QFrame.Raised)
         self.thumbnail_frame.setObjectName("thumbnail_frame")
         self.horizontalLayout_3 = QtGui.QHBoxLayout(self.thumbnail_frame)
-        self.horizontalLayout_3.setContentsMargins(2, 2, 2, 2)
+        self.horizontalLayout_3.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.thumbnail_widget = ThumbnailWidget(self.thumbnail_frame)
         self.thumbnail_widget.setMinimumSize(QtCore.QSize(0, 0))

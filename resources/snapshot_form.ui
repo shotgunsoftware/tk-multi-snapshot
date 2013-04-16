@@ -116,9 +116,11 @@ scene that you can easily go back to later.</string>
              </property>
              <property name="styleSheet">
               <string notr="true">#thumbnail_frame {
-border-style: Solid;
+border-style: solid;
+border-color: rgb(32,32,32);
+border-width: 1px;
 border-radius: 3px;
-background: rgb(32,32,32);
+background: rgb(117,117,117);
 }</string>
              </property>
              <property name="frameShape">
@@ -129,7 +131,7 @@ background: rgb(32,32,32);
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <property name="margin">
-               <number>2</number>
+               <number>0</number>
               </property>
               <item>
                <widget class="ThumbnailWidget" name="thumbnail_widget" native="true">
