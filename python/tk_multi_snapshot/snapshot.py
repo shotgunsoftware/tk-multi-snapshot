@@ -301,6 +301,12 @@ class Snapshot(object):
         """
         Restore the specified snapshot
         """
+        res = QtGui.QMessageBox.question(None,  "Restore Snapshot?", 
+                                         "A snapshot of the current work file will be made before restoring.\n\nContinue?", 
+                                         QtGui.QMessageBox.Ok | QtGui.QMessageBox.Cancel)
+        if res == QtGui.QMessageBox.Cancel:
+            return
+        
         try:
             self.restore_snapshot(snapshot_path)
         except TankError, e:
