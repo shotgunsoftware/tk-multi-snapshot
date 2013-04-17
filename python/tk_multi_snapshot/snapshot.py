@@ -41,8 +41,6 @@ class Snapshot(object):
         """
         self._app = app
         
-        self._snapshot_history_ui = None
-        
         self._work_template = self._app.get_template("template_work")
         self._snapshot_template = self._app.get_template("template_snapshot")
         
@@ -274,15 +272,15 @@ class Snapshot(object):
         
         # create dialog and hook up signals:
         from .snapshot_history_form import SnapshotHistoryForm
-        self._snapshot_history_ui = self._app.engine.show_dialog("Snapshot History", self._app, SnapshotHistoryForm, self._app, self)
+        snapshot_history_form = self._app.engine.show_dialog("Snapshot History", self._app, SnapshotHistoryForm, self._app, self)
         
-        self._snapshot_history_ui.restore.connect(self._on_history_restore_snapshot)
-        self._snapshot_history_ui.snapshot.connect(self._on_history_do_snapshot)
+        snapshot_history_form.restore.connect(lambda f=snapshot_history_form: self._on_history_restore_snapshot(f))
+        snapshot_history_form.snapshot.connect(lambda f=snapshot_history_form: self._on_history_do_snapshot(f))
         
         # update UI:
-        self._update_snapshot_history_ui()
+        self._update_snapshot_history_ui(snapshot_history_form)
     
-    def _update_snapshot_history_ui(self):
+    def _update_snapshot_history_ui(self, snapshot_history_form):
         """
         Update the snapshot history UI after a change
         """
@@ -297,9 +295,9 @@ class Snapshot(object):
             QtGui.QMessageBox.critical(None, "Snapshot History Error!", msg)
             current_file_path = None
             
-        self._snapshot_history_ui.path = current_file_path
+        snapshot_history_form.path = current_file_path
 
-    def _on_history_restore_snapshot(self, snapshot_path):
+    def _on_history_restore_snapshot(self, snapshot_history_form, snapshot_path):
         """
         Restore the specified snapshot
         """
@@ -318,22 +316,18 @@ class Snapshot(object):
             self._app.log_exception("Snapshot Restore Failed!")
             return
         
-        self._snapshot_history_ui.close()
+        snapshot_history_form.close()
         
-    def _on_history_do_snapshot(self):
+    def _on_history_do_snapshot(self, snapshot_history_form):
         """
         Switch to the snapshot UI from the history UI
-        """        
-        # hide the snapshot history window:
-        self._snapshot_history_ui.window().hide()
-        
+        """
+        # close the snapshot history window
+        snapshot_history_form.close()
+            
         # do a snapshot:
         self._show_snapshot_dlg()
-
-        # show history windows and refresh:
-        self._snapshot_history_ui.window().show()        
-        self._snapshot_history_ui.refresh()
-
+   
     def _find_next_snapshot_increment(self, snapshot_fields):
         # work out the snapshot directory and find all files
         
