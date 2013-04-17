@@ -32,6 +32,8 @@ class SceneOperation(Hook):
                                      file path as a String
                     all others     - None
         """
+        if file_path:
+            file_path = file_path.replace("/", os.path.sep)        
         
         if operation == "current_path":
             # return the current script path
