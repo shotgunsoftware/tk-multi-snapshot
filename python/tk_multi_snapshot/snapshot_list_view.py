@@ -126,7 +126,9 @@ class SnapshotListView(browser_widget.BrowserWidget):
                 
                 comment = details.get("comment")
                 if comment:
-                    lines.append(comment)
+                    lines.append("Description: %s" % comment)
+                else:
+                    lines.append("<i>No description was entered for this snapshot</i>")
                     
                 list_item.set_details("<br>".join(lines))
 
