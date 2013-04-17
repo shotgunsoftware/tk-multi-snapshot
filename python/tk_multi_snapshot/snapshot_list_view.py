@@ -100,12 +100,6 @@ class SnapshotListView(browser_widget.BrowserWidget):
                 header.set_title("Snapshots From %s" % date_str)
             
             for details in items:
-                """
-                Version v023 at 13.36
-                Created by Manne Ohrstrom
-                Comment: Added some more funky speculars
-                """
-                
                 list_item = self.add_item(SnapshotItem)
                 list_item.path = details.get("file")
                                 
@@ -127,7 +121,8 @@ class SnapshotListView(browser_widget.BrowserWidget):
                 lines.append("<b>%s</b>" % line)
                 
                 user = details.get("user")
-                lines.append("Created by %s" % (user if user else "?"))
+                if user:
+                    lines.append("Created by %s" % user)
                 
                 comment = details.get("comment")
                 if comment:

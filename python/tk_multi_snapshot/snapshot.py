@@ -217,10 +217,14 @@ class Snapshot(object):
         
         # current scene path must match work template and contain version:
         if not work_file_path or not self._work_template.validate(work_file_path):
-            # TODO: need to hook this up to workfiles
-            msg = ("Current scene is not a valid work file!  Please save as a "
-                   "work file to continue")
-            QtGui.QMessageBox.critical(None, "Unable To Snapshot!", msg)
+            msg = ("Unable to snapshot!\n\nPlease save the scene as a valid work file before continuing")
+            QtGui.QMessageBox.information(None, "Unable To Snapshot!", msg)
+
+            # try to launch tank save-as command if we have it:            
+            tank_save_as_cmd = tank.platform.current_engine().commands.get("Tank Save As...")
+            if tank_save_as_cmd:
+                tank_save_as_cmd["callback"]()
+                
             return
         
         # get initial thumbnail if there is one:
@@ -396,6 +400,12 @@ class Snapshot(object):
         work_file_name = os.path.basename(work_path)
         work_file_title = os.path.splitext(work_file_name)[0]
         comments_file_path = "%s/%s.tank_comments.yml" % (snapshot_dir, work_file_title)
+        
+        if not os.path.exists(comments_file_path):
+            # look for old nuke style path:
+            SNAPSHOT_COMMENTS_FILE = r"%s_comments.yml"
+            comments_file_name = SNAPSHOT_COMMENTS_FILE % fields.get("name", "unknown")
+            comments_file_path = os.path.join(snapshot_dir, comments_file_name)
         
         return comments_file_path
     
