@@ -201,7 +201,7 @@ class Snapshot(object):
         try:
             work_file_path = self.get_current_file_path()
         except Exception, e:
-            msg = ("Failed to get the current work file path due to the following reason:\n\n"
+            msg = ("Failed to get the current file path:\n\n"
                   "%s\n\n"
                   "Unable to continue!" % e)
             QtGui.QMessageBox.critical(None, "Snapshot Error!", msg)
