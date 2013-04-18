@@ -39,7 +39,10 @@ class SceneOperation(Hook):
             # return the current script path
             return nuke.root().name().replace("/", os.path.sep)
         elif operation == "open":
-            # open the specified script
+            # open the specified script into the current window
+            if nuke.root().modified():
+                raise TankError("Script is modified!")
+            nuke.scriptClear()
             nuke.scriptOpen(file_path)
         elif operation == "save":
             # save the current script:

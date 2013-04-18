@@ -8,10 +8,13 @@ from tank.platform.qt import QtCore, QtGui
 
 class SnapshotHistoryForm(QtGui.QWidget):
     
-    restore = QtCore.Signal(str)
+    restore = QtCore.Signal(str, str)
     snapshot = QtCore.Signal()
     
     def __init__(self, app, handler, parent = None):
+        """
+        Construction
+        """
         QtGui.QWidget.__init__(self, parent)
     
         self._app = app
@@ -32,28 +35,34 @@ class SnapshotHistoryForm(QtGui.QWidget):
         
         self._ui.snapshot_btn.clicked.connect(self._on_snapshot_btn_clicked)
         
-        self._update_ui()
-    
     @property
     def path(self):
         return self._path
-    @path.setter
-    def path(self, value):
-        if value != self._path:
-            self._path = value
-            file_name = os.path.basename(self._path)
-            self._ui.snapshot_list.set_label(file_name)
-            self._reload_history()
             
     def refresh(self):
-        self._reload_history()
+        # clear the snapshot list:
+        self._ui.snapshot_list.clear()
         
+        # get the current path from the handler:
+        self._path = None
+        try:
+            self._path = self._handler.get_current_file_path()
+        except Exception, e:
+            # this only ever happens when the scene operation hook
+            # throws an exception!
+            msg = ("Failed to find the current work file path:\n\n"
+                  "%s\n\n"
+                  "Unable to continue!" % e)
+            self._ui.snapshot_list.set_message(msg)
+        else:
+            self._ui.snapshot_list.load({"handler":self._handler,
+                                         "file_path":self._path})        
     def event(self, event):
         """
         override event to cause UI to reload the first time it is shown:
         """
         if event.type() == QtCore.QEvent.Polish:
-            self._reload_history()
+            self.refresh()
         return QtGui.QWidget.event(self, event)
 
     def _on_list_selection_changed(self):
@@ -61,15 +70,10 @@ class SnapshotHistoryForm(QtGui.QWidget):
         
     def _on_restore(self):
         path = self._ui.snapshot_list.get_selected_path()
-        self.restore.emit(path)
+        self.restore.emit(self._path, path)
         
     def _on_snapshot_btn_clicked(self):
         self.snapshot.emit()
-        
-    def _reload_history(self):
-        self._ui.snapshot_list.clear()
-        self._ui.snapshot_list.load({"handler":self._handler,
-                                     "file_path":self._path})
         
     def _update_ui(self):
         can_restore = self._ui.snapshot_list.get_selected_item() != None

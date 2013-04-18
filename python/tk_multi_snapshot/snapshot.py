@@ -112,40 +112,34 @@ class Snapshot(object):
         if thumbnail:
             self._add_snapshot_thumbnail(snapshot_path, thumbnail)
         
-    def restore_snapshot(self, snapshot_path):
+    def restore_snapshot(self, current_path, snapshot_path):
         """
         Restore snapshot from the specified path
         """
-        if not snapshot_path:
+        if not current_path or not snapshot_path:
             return
         
         # to be on the safe side, save the current file
         # as it may be overidden:
         self.save_current_file()
         
-        # validate snapshot path
-        if not self._snapshot_template.validate(snapshot_path):
-            raise TankError("%s is not a valid snapshot path!" % snapshot_path)
-        fields = self._snapshot_template.get_fields(snapshot_path)
-        work_path = self._work_template.apply_fields(fields)
-        
         # check to see if work file exists and if it does, snapshot it first:
-        if os.path.exists(work_path):
+        if os.path.exists(current_path):
             try:
                 comment = ("Automatic snapshot before restoring older snapshot '%s'" 
                             % os.path.basename(snapshot_path))
-                self.do_snapshot(work_path, None, comment)
+                self.do_snapshot(current_path, None, comment)
             except:
                 # reformat error?
                 raise
         
         # now use hook to copy snapshot back to work path:
-        self._app.log_debug("Snapshot Restore: Copying %s --> %s" % (work_path, snapshot_path))
-        self.copy_file(snapshot_path, work_path)
+        self._app.log_debug("Snapshot Restore: Copying %s --> %s" % (snapshot_path, current_path))
+        self.copy_file(snapshot_path, current_path)
         
         # finally, use hook to re-open work file:
-        self._app.log_debug("Snapshot Restore: Opening %s" % (work_path))
-        self.open_file(work_path)
+        self._app.log_debug("Snapshot Restore: Opening %s" % (current_path))
+        self.open_file(current_path)
 
     def find_snapshot_history(self, file_path):
         """
@@ -273,42 +267,31 @@ class Snapshot(object):
         # create dialog and hook up signals:
         from .snapshot_history_form import SnapshotHistoryForm
         snapshot_history_form = self._app.engine.show_dialog("Snapshot History", self._app, SnapshotHistoryForm, self._app, self)
-        
-        snapshot_history_form.restore.connect(lambda f=snapshot_history_form: self._on_history_restore_snapshot(f))
+        snapshot_history_form.restore.connect(lambda cp, sp, f=snapshot_history_form: self._on_history_restore_snapshot(f, cp, sp))
         snapshot_history_form.snapshot.connect(lambda f=snapshot_history_form: self._on_history_do_snapshot(f))
-        
-        # update UI:
-        self._update_snapshot_history_ui(snapshot_history_form)
-    
-    def _update_snapshot_history_ui(self, snapshot_history_form):
-        """
-        Update the snapshot history UI after a change
-        """
-        # get the current file path:
-        current_file_path = None
-        try:
-            current_file_path = self.get_current_file_path()
-        except Exception, e:
-            msg = ("Failed to find the current work file path due to the following reason:\n\n"
-                  "%s\n\n"
-                  "Unable to continue!" % e)
-            QtGui.QMessageBox.critical(None, "Snapshot History Error!", msg)
-            current_file_path = None
-            
-        snapshot_history_form.path = current_file_path
-
-    def _on_history_restore_snapshot(self, snapshot_history_form, snapshot_path):
+ 
+    def _on_history_restore_snapshot(self, snapshot_history_form, current_path, snapshot_path):
         """
         Restore the specified snapshot
         """
+        # double check that the current path is still correct - if 
+        # it's not then something happened to change the current scene
+        # this can happen because this isn't a modal dialog!
+        actual_current_path = self.get_current_file_path()
+        if actual_current_path != current_path:
+            snapshot_history_form.refresh()
+            return
+        
+        # confirm snapshot restore:
         res = QtGui.QMessageBox.question(None,  "Restore Snapshot?", 
                                          "A snapshot of the current work file will be made before restoring.\n\nContinue?", 
                                          QtGui.QMessageBox.Ok | QtGui.QMessageBox.Cancel)
         if res == QtGui.QMessageBox.Cancel:
             return
         
+        # do snapshot restore
         try:
-            self.restore_snapshot(snapshot_path)
+            self.restore_snapshot(current_path, snapshot_path)
         except TankError, e:
             QtGui.QMessageBox.critical(None, "Snapshot Restore Failed!", e)
             return
@@ -395,11 +378,13 @@ class Snapshot(object):
         work_file_title = os.path.splitext(work_file_name)[0]
         comments_file_path = "%s/%s.tank_comments.yml" % (snapshot_dir, work_file_title)
         
+        """
         if not os.path.exists(comments_file_path):
             # look for old nuke style path:
             SNAPSHOT_COMMENTS_FILE = r"%s_comments.yml"
             comments_file_name = SNAPSHOT_COMMENTS_FILE % fields.get("name", "unknown")
             comments_file_path = os.path.join(snapshot_dir, comments_file_name)
+        """
         
         return comments_file_path
     
