@@ -54,9 +54,16 @@ class SnapshotHistoryForm(QtGui.QWidget):
                   "%s\n\n"
                   "Unable to continue!" % e)
             self._ui.snapshot_list.set_message(msg)
-        else:
-            self._ui.snapshot_list.load({"handler":self._handler,
-                                         "file_path":self._path})        
+            return
+        
+        # load file list:
+        self._ui.snapshot_list.load({"handler":self._handler,
+                                     "file_path":self._path})
+        
+        # update the browser title:
+        self._ui.snapshot_list.set_label(self._handler.get_history_display_name(self._path))
+        
+              
     def event(self, event):
         """
         override event to cause UI to reload the first time it is shown:

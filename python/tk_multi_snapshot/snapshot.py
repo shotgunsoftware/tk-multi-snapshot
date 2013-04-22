@@ -202,6 +202,24 @@ class Snapshot(object):
             
         return history 
 
+    def get_history_display_name(self, path):
+        """
+        Get a nice display name for the snapshot history list
+        """
+        display_name = ""
+
+        fields = self._work_template.get_fields(path)
+        if "name" in fields:
+            display_name = fields["name"]
+            
+        if not display_name:
+            # do something more clever with the file name:
+            fields["version"] = "v###"
+            versionless_path = self._work_template.apply_fields(fields)
+            display_name = os.path.basename(versionless_path)
+            
+        return display_name if display_name else "Unknown"
+
     def _get_file_last_modified_user(self, path):
         """
         Get the user details of the last person
