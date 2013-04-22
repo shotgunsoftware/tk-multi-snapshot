@@ -20,22 +20,6 @@ class Snapshot(object):
     # Format of the timestamp used in snapshot files
     TIMESTAMP_FMT = "%Y-%m-%d-%H-%M-%S"
     
-    @staticmethod
-    def show_snapshot_dlg(app):
-        """
-        Helper method to do a snapshot with a dialog
-        """
-        handler = Snapshot(app)
-        handler._show_snapshot_dlg()
-        
-    @staticmethod
-    def show_snapshot_history_dlg(app):
-        """
-        Helper method to show the snapshot history dialog
-        """
-        handler = Snapshot(app)
-        handler._show_snapshot_history_dlg()
-        
     def __init__(self, app):
         """
         Construction
@@ -256,7 +240,7 @@ class Snapshot(object):
             self._user_details_cache[login_name] = sg_user
         return sg_user
 
-    def _show_snapshot_dlg(self):
+    def show_snapshot_dlg(self):
         """
         Perform a snapshot of the current work file with the help of the UI
         """
@@ -292,7 +276,7 @@ class Snapshot(object):
       
         # special case return code to show history dialog:
         if res == SnapshotForm.SHOW_HISTORY_RETURN_CODE:
-            self._show_snapshot_history_dlg()
+            self.show_snapshot_history_dlg()
 
         
     def _setup_snapshot_ui(self, snapshot_widget):
@@ -323,7 +307,7 @@ class Snapshot(object):
         # update UI:
         snapshot_widget.show_result(status, msg)
 
-    def _show_snapshot_history_dlg(self):
+    def show_snapshot_history_dlg(self):
         """
         Show the snapshot history UI for the current path
         """
@@ -373,7 +357,7 @@ class Snapshot(object):
         snapshot_history_form.close()
             
         # do a snapshot:
-        self._show_snapshot_dlg()
+        self.show_snapshot_dlg()
    
     def _find_next_snapshot_increment(self, snapshot_fields):
         # work out the snapshot directory and find all files

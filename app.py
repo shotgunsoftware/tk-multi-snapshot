@@ -18,6 +18,7 @@ class MultiSnapshot(tank.platform.Application):
         """
                 
         tk_multi_snapshot = self.import_module("tk_multi_snapshot")
+        self._handler = tk_multi_snapshot.Snapshot(self)
       
         # validate templates:
         work_template = self.get_template("template_work")
@@ -30,11 +31,15 @@ class MultiSnapshot(tank.platform.Application):
             return
       
         # register commands:
-        cmd = lambda app=self: tk_multi_snapshot.Snapshot.show_snapshot_dlg(app)
-        self.engine.register_command("Snapshot...", cmd)
-        
-        cmd = lambda app=self: tk_multi_snapshot.Snapshot.show_snapshot_history_dlg(app)
-        self.engine.register_command("Snapshot History...", cmd)
+        self.engine.register_command("Snapshot...", self._handler.show_snapshot_dlg)
+        self.engine.register_command("Snapshot History...", self._handler.show_snapshot_history_dlg)
         
     def destroy_app(self):
         self.log_debug("Destroying tk-multi-snapshot")
+        
+    def snapshot(self, comment=None, thumbnail=None):
+        """
+        Snapshots the current scene without any UI
+        """
+        work_path = self._handler.get_current_file_path()
+        self._handler.do_snapshot(work_path, thumbnail, comment)
