@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'snapshot_form.ui'
 #
-# Created: Tue Apr 16 23:15:14 2013
+# Created: Mon Apr 22 12:50:33 2013
 #      by: pyside-uic 0.2.13 running on PySide 1.1.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,7 +12,7 @@ from PySide import QtCore, QtGui
 class Ui_SnapshotForm(object):
     def setupUi(self, SnapshotForm):
         SnapshotForm.setObjectName("SnapshotForm")
-        SnapshotForm.resize(500, 316)
+        SnapshotForm.resize(500, 320)
         SnapshotForm.setMinimumSize(QtCore.QSize(500, 0))
         self.verticalLayout = QtGui.QVBoxLayout(SnapshotForm)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -50,11 +50,12 @@ class Ui_SnapshotForm(object):
         self.horizontalLayout_2.addWidget(self.label)
         self.verticalLayout_2.addWidget(self.header_frame)
         self.gridLayout_2 = QtGui.QGridLayout()
-        self.gridLayout_2.setVerticalSpacing(4)
+        self.gridLayout_2.setVerticalSpacing(8)
         self.gridLayout_2.setObjectName("gridLayout_2")
         self.comment_edit = QtGui.QTextEdit(self.snapshot_page)
         self.comment_edit.setMinimumSize(QtCore.QSize(0, 0))
         self.comment_edit.setMaximumSize(QtCore.QSize(16777215, 120))
+        self.comment_edit.setTabChangesFocus(True)
         self.comment_edit.setObjectName("comment_edit")
         self.gridLayout_2.addWidget(self.comment_edit, 1, 0, 1, 1)
         self.thumbnail_frame = QtGui.QFrame(self.snapshot_page)
@@ -147,6 +148,7 @@ class Ui_SnapshotForm(object):
         self.horizontalLayout_7 = QtGui.QHBoxLayout()
         self.horizontalLayout_7.setObjectName("horizontalLayout_7")
         self.history_btn = QtGui.QPushButton(self.status_page)
+        self.history_btn.setMinimumSize(QtCore.QSize(195, 0))
         self.history_btn.setObjectName("history_btn")
         self.horizontalLayout_7.addWidget(self.history_btn)
         spacerItem5 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
@@ -176,9 +178,10 @@ class Ui_SnapshotForm(object):
         self.retranslateUi(SnapshotForm)
         self.page_stack.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(SnapshotForm)
+        SnapshotForm.setTabOrder(self.comment_edit, self.snapshot_btn)
         SnapshotForm.setTabOrder(self.snapshot_btn, self.cancel_btn)
-        SnapshotForm.setTabOrder(self.cancel_btn, self.history_btn)
-        SnapshotForm.setTabOrder(self.history_btn, self.close_btn)
+        SnapshotForm.setTabOrder(self.cancel_btn, self.close_btn)
+        SnapshotForm.setTabOrder(self.close_btn, self.history_btn)
 
     def retranslateUi(self, SnapshotForm):
         SnapshotForm.setWindowTitle(QtGui.QApplication.translate("SnapshotForm", "Form", None, QtGui.QApplication.UnicodeUTF8))
