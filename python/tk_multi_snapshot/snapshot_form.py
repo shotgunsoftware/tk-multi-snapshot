@@ -33,7 +33,7 @@ class SnapshotForm(QtGui.QWidget):
         self._ui = Ui_SnapshotForm()
         self._ui.setupUi(self)
 
-        self.thumbnail = thumbnail
+        self._ui.thumbnail_widget.thumbnail = thumbnail
         self._exit_code = QtGui.QDialog.Rejected
 
         self._ui.snapshot_btn.clicked.connect(self._on_do_snapshot)        
