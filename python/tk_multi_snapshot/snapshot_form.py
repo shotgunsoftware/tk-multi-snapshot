@@ -43,6 +43,12 @@ class SnapshotForm(QtGui.QWidget):
 
         # ensure snapshot page is shown first:
         self._ui.page_stack.setCurrentWidget(self._ui.snapshot_page)
+
+        # set focus proxy to the comment edit (first in order)        
+        self.setFocusProxy(self._ui.comment_edit)
+        
+        # want to intercept 'enter' key pressed in the comment edit:
+        self._ui.comment_edit.keyPressEvent = lambda e, df=self._ui.comment_edit.keyPressEvent: self._on_comment_edit_key_pressed(df, e)
         
         # finally, run setup callback to allow caller to connect 
         # up signals etc.
@@ -50,21 +56,17 @@ class SnapshotForm(QtGui.QWidget):
             
     @property
     def exit_code(self):
+        """
+        Used to pass exit code back though tank dialog
+        """
         return self._exit_code
     
     @property
     def thumbnail(self):
         return self._ui.thumbnail_widget.thumbnail
-    @thumbnail.setter
-    def thumbnail(self, value):
-        self._ui.thumbnail_widget.thumbnail = value
-    
     @property
     def comment(self):
         return self._ui.comment_edit.toPlainText().rstrip()
-    @comment.setter
-    def comment(self, value):
-        self._ui.comment_edit.setPlainText(value)
         
     def show_result(self, status, msg):
         """
@@ -74,6 +76,18 @@ class SnapshotForm(QtGui.QWidget):
         self._ui.status_title.setText(["Oh No, Something Went Wrong!", "Success!"][status])
         self._ui.status_details.setText([msg, "Snapshot Successfully Created"][not msg])
         self._ui.status_icon.setPixmap(QtGui.QPixmap([":/res/failure.png", ":/res/success.png"][status]))
+        
+    def _on_comment_edit_key_pressed(self, default_func, event):
+        """
+        Custom override of the comment edit keyPressEvent function.
+        Allows us to trap the 'Enter' key press so that we can do
+        a snapshot instead of a new line!
+        """
+        # check for enter key being pressed:
+        if event.key() == QtCore.Qt.Key_Return:
+            self._on_do_snapshot()
+        elif default_func:
+            return default_func(event)
         
     def _on_do_cancel(self):
         self._exit_code = QtGui.QDialog.Rejected

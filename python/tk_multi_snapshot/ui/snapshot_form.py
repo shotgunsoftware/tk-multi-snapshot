@@ -2,18 +2,18 @@
 
 # Form implementation generated from reading ui file 'snapshot_form.ui'
 #
-# Created: Mon Apr 22 12:50:33 2013
 #      by: pyside-uic 0.2.13 running on PySide 1.1.0
 #
 # WARNING! All changes made in this file will be lost!
 
-from PySide import QtCore, QtGui
+from tank.platform.qt import QtCore, QtGui
 
 class Ui_SnapshotForm(object):
     def setupUi(self, SnapshotForm):
         SnapshotForm.setObjectName("SnapshotForm")
-        SnapshotForm.resize(500, 320)
+        SnapshotForm.resize(500, 316)
         SnapshotForm.setMinimumSize(QtCore.QSize(500, 0))
+        SnapshotForm.setFocusPolicy(QtCore.Qt.TabFocus)
         self.verticalLayout = QtGui.QVBoxLayout(SnapshotForm)
         self.verticalLayout.setObjectName("verticalLayout")
         self.page_stack = QtGui.QStackedWidget(SnapshotForm)
@@ -50,7 +50,7 @@ class Ui_SnapshotForm(object):
         self.horizontalLayout_2.addWidget(self.label)
         self.verticalLayout_2.addWidget(self.header_frame)
         self.gridLayout_2 = QtGui.QGridLayout()
-        self.gridLayout_2.setVerticalSpacing(8)
+        self.gridLayout_2.setVerticalSpacing(4)
         self.gridLayout_2.setObjectName("gridLayout_2")
         self.comment_edit = QtGui.QTextEdit(self.snapshot_page)
         self.comment_edit.setMinimumSize(QtCore.QSize(0, 0))
@@ -77,6 +77,7 @@ class Ui_SnapshotForm(object):
         self.thumbnail_widget = ThumbnailWidget(self.thumbnail_frame)
         self.thumbnail_widget.setMinimumSize(QtCore.QSize(0, 0))
         self.thumbnail_widget.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        self.thumbnail_widget.setFocusPolicy(QtCore.Qt.NoFocus)
         self.thumbnail_widget.setStyleSheet("")
         self.thumbnail_widget.setObjectName("thumbnail_widget")
         self.horizontalLayout_3.addWidget(self.thumbnail_widget)
@@ -102,6 +103,7 @@ class Ui_SnapshotForm(object):
         self.horizontalLayout_5.addWidget(self.cancel_btn)
         self.snapshot_btn = QtGui.QPushButton(self.snapshot_page)
         self.snapshot_btn.setMinimumSize(QtCore.QSize(145, 0))
+        self.snapshot_btn.setDefault(True)
         self.snapshot_btn.setObjectName("snapshot_btn")
         self.horizontalLayout_5.addWidget(self.snapshot_btn)
         self.verticalLayout_2.addLayout(self.horizontalLayout_5)
@@ -169,6 +171,7 @@ class Ui_SnapshotForm(object):
         self.horizontalLayout_6.addItem(spacerItem9)
         self.close_btn = QtGui.QPushButton(self.status_page)
         self.close_btn.setMinimumSize(QtCore.QSize(80, 0))
+        self.close_btn.setDefault(True)
         self.close_btn.setObjectName("close_btn")
         self.horizontalLayout_6.addWidget(self.close_btn)
         self.verticalLayout_5.addLayout(self.horizontalLayout_6)
@@ -178,10 +181,11 @@ class Ui_SnapshotForm(object):
         self.retranslateUi(SnapshotForm)
         self.page_stack.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(SnapshotForm)
-        SnapshotForm.setTabOrder(self.comment_edit, self.snapshot_btn)
-        SnapshotForm.setTabOrder(self.snapshot_btn, self.cancel_btn)
-        SnapshotForm.setTabOrder(self.cancel_btn, self.close_btn)
-        SnapshotForm.setTabOrder(self.close_btn, self.history_btn)
+        SnapshotForm.setTabOrder(self.comment_edit, self.thumbnail_widget)
+        SnapshotForm.setTabOrder(self.thumbnail_widget, self.cancel_btn)
+        SnapshotForm.setTabOrder(self.cancel_btn, self.snapshot_btn)
+        SnapshotForm.setTabOrder(self.snapshot_btn, self.history_btn)
+        SnapshotForm.setTabOrder(self.history_btn, self.close_btn)
 
     def retranslateUi(self, SnapshotForm):
         SnapshotForm.setWindowTitle(QtGui.QApplication.translate("SnapshotForm", "Form", None, QtGui.QApplication.UnicodeUTF8))
