@@ -3,6 +3,7 @@ Copyright (c) 2013 Shotgun Software, Inc
 ----------------------------------------------------
 """
 import os
+import sys
 from datetime import datetime 
 import tempfile
 
@@ -40,6 +41,7 @@ class Snapshot(object):
         Construction
         """
         self._app = app
+        self._user_details_cache = {}
         
         self._work_template = self._app.get_template("template_work")
         self._snapshot_template = self._app.get_template("template_snapshot")
@@ -107,8 +109,7 @@ class Snapshot(object):
                             % (work_path, snapshot_path))
         
         # ok, snapshot succeeded so update comment and thumbnail if we have them:
-        if comment:
-            self._add_snapshot_comment(snapshot_path, comment)
+        self._add_snapshot_comment(snapshot_path, comment)
         if thumbnail:
             self._add_snapshot_thumbnail(snapshot_path, thumbnail)
         
@@ -170,8 +171,12 @@ class Snapshot(object):
         comments = self._get_snapshot_comments(files[0])
         
         for file in files:
+            # extract any details we have from the comments:
+            comment_details = comments.get(os.path.basename(file), {})
+            comment = comment_details.get("comment", "")
+            sg_user = comment_details.get("sg_user")
             details = {"file":file, 
-                       "comment":comments.get(os.path.basename(file), ""), 
+                       "comment":comment, 
                        "thumbnail_path":self._get_thumbnail_file_path(file)
                        }
             
@@ -186,11 +191,52 @@ class Snapshot(object):
             if timestamp:
                 details["datetime"] = datetime.strptime(timestamp, Snapshot.TIMESTAMP_FMT)
                  
-            # user?
+            # user
+            if sg_user:
+                details["user"] = sg_user
+            else:
+                # try to get the user that last modified the file:
+                details["user"] = self._get_file_last_modified_user(file)
             
             history.append(details)
             
         return history 
+
+    def _get_file_last_modified_user(self, path):
+        """
+        Get the user details of the last person
+        to modify the specified file        
+        """
+        login_name = None
+        if sys.platform == "win32":
+            # TODO: add windows support..
+            pass
+        else:
+            try:
+                from pwd import getpwuid                
+                login_name = getpwuid(os.stat(path).st_uid).pw_name
+            except:
+                pass
+        
+        if login_name:
+            return self._get_user_details(login_name)
+        
+        return None
+
+    def _get_user_details(self, login_name):
+        """
+        Get the shotgun HumanUser entry:
+        """
+        sg_user = self._user_details_cache.get(login_name)
+        if not sg_user:
+            try:
+                filter = ["login", "is", login_name]
+                fields = ["id", "type", "email", "login", "name", "image"]
+                sg_user = self._app.shotgun.find_one("HumanUser", [filter], fields)
+            except:
+                pass
+            self._user_details_cache[login_name] = sg_user
+        return sg_user
 
     def _show_snapshot_dlg(self):
         """
@@ -378,26 +424,40 @@ class Snapshot(object):
         work_file_title = os.path.splitext(work_file_name)[0]
         comments_file_path = "%s/%s.tank_comments.yml" % (snapshot_dir, work_file_title)
         
+        return comments_file_path
+
+        
+    def _load_nuke_publish_snapshot_comments(self, snapshot_file_path):
         """
-        if not os.path.exists(comments_file_path):
-            # look for old nuke style path:
+        Load old nuke-style snapshot comments if they exist.  These are only
+        ever read - all new comments are saved to the new file.
+        """
+        comments = {}
+        try:
+            # look for old nuke style path:        
+            snapshot_dir = os.path.dirname(snapshot_file_path)
+            fields = self._snapshot_template.get_fields(snapshot_file_path)
             SNAPSHOT_COMMENTS_FILE = r"%s_comments.yml"
             comments_file_name = SNAPSHOT_COMMENTS_FILE % fields.get("name", "unknown")
             comments_file_path = os.path.join(snapshot_dir, comments_file_name)
-        """
-        
-        return comments_file_path
-    
-        """
-        (AD) - old version - relied on name in work file name
-        # assume path where we store yml snapshots file is folder
-        # where snapshots are stored (feels overkill to have a template
-        # configured for this file)
-        snapshot_dir = os.path.dirname(snapshot_file_path)
-        fields = self._snapshot_template.get_fields(snapshot_file_path)
-        comments_file_name = SNAPSHOT_COMMENTS_FILE % fields.get("name", "unknown")
-        comments_file_path = os.path.join(snapshot_dir, comments_file_name)
-        """
+            
+            comments = {}
+            if os.path.exists(comments_file_path):
+                raw_comments = yaml.load(open(comments_file_path, "r"))
+                for (name, timestamp), comment in raw_comments.iteritems():
+                    fields["name"] = name
+                    fields["timestamp"] = timestamp
+                    snapshot_path = self._snapshot_template.apply_fields(fields)
+                    
+                    if os.path.exists(snapshot_path):
+                        # add comment to dictionary in new style:
+                        comments_key = os.path.basename(snapshot_path)
+                        comments[comments_key] = {"comment":comment}
+        except:
+            # it's not critical that this succeeds so just ignore any exceptions
+            pass
+            
+        return comments
         
     def _add_snapshot_comment(self, snapshot_file_path, comment):
         """
@@ -421,33 +481,40 @@ class Snapshot(object):
         comments = {}
         if os.path.exists(comments_file_path):
             comments = yaml.load(open(comments_file_path, "r"))
+
+        # comment is now a dictionary so that we can also include the user:
+        comments_value = {"comment":comment, "sg_user":self._app.context.user}
             
         # add entry for snapshot file:
         comments_key = os.path.basename(snapshot_file_path)
-        """    
-        (AD) - need to check but this makes no sense to me - surely just storing
-        relative to the file name is a better idea or do we need to handle file
-        names changing??
-        
-        # add entry - key it by name + timestamp + increment
-        comments_key = (fields.get("name", "unknown"), 
-                        fields.get("timestamp", "unknown"), 
-                        fields.get("increment", "unknown"))
-        """
-        comments[comments_key] = comment
+        comments[comments_key] = comments_value
         
         # and save yml file
         yaml.dump(comments, open(comments_file_path, "w"))
         
     
-    def _get_snapshot_comments(self, file_path):
+    def _get_snapshot_comments(self, snapshot_file_path):
         """
         Return the snapshot comments for the specified file path
         """
-        comments_file_path = self._get_comments_file_path(file_path)
-        comments = {}
+        # first, attempt to load old-nuke-publish-style comments:
+        comments = self._load_nuke_publish_snapshot_comments(snapshot_file_path)
+        
+        # now load new style comments:
+        comments_file_path = self._get_comments_file_path(snapshot_file_path)
+        raw_comments = {}
         if os.path.exists(comments_file_path):
-            comments = yaml.load(open(comments_file_path, "r"))
+            raw_comments = yaml.load(open(comments_file_path, "r"))
+            
+        # process raw comments to convert old-style to new if need to:
+        for key, value in raw_comments.iteritems():
+            if isinstance(value, basestring):
+                # old style string
+                comments[key] = {"comment":value}
+            else:#if isinstance(value, dict):
+                # new style dictionary
+                comments[key] = value
+            
         return comments        
         
         

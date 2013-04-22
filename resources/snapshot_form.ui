@@ -23,7 +23,7 @@
    <item>
     <widget class="QStackedWidget" name="page_stack">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="snapshot_page">
       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0">
@@ -360,6 +360,12 @@ font-size: 24px;
             <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="0,1">
              <item>
               <widget class="QPushButton" name="history_btn">
+               <property name="minimumSize">
+                <size>
+                 <width>195</width>
+                 <height>0</height>
+                </size>
+               </property>
                <property name="text">
                 <string>View Snapshot History...</string>
                </property>
@@ -468,10 +474,11 @@ font-size: 24px;
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>comment_edit</tabstop>
   <tabstop>snapshot_btn</tabstop>
   <tabstop>cancel_btn</tabstop>
-  <tabstop>history_btn</tabstop>
   <tabstop>close_btn</tabstop>
+  <tabstop>history_btn</tabstop>
  </tabstops>
  <resources>
   <include location="resources.qrc"/>

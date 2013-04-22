@@ -121,8 +121,9 @@ class SnapshotListView(browser_widget.BrowserWidget):
                 lines.append("<b>%s</b>" % line)
                 
                 user = details.get("user")
-                if user:
-                    lines.append("Created by %s" % user)
+                username = user.get("name") if user else None
+                if username:
+                    lines.append("Created by %s" % username)
                 
                 comment = details.get("comment")
                 if comment:
