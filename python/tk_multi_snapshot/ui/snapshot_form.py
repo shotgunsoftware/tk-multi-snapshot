@@ -145,6 +145,7 @@ class Ui_SnapshotForm(object):
         self.status_details = QtGui.QLabel(self.status_page)
         self.status_details.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.status_details.setWordWrap(False)
+        self.status_details.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByMouse|QtCore.Qt.TextSelectableByMouse)
         self.status_details.setObjectName("status_details")
         self.verticalLayout_6.addWidget(self.status_details)
         self.horizontalLayout_7 = QtGui.QHBoxLayout()
