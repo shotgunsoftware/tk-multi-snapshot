@@ -58,31 +58,30 @@ class Snapshot(object):
         """
         Do a snapshot using the specified details
         """
-        
         # save the current scene:
         self.save_current_file()
-         
+
         # ensure work file exists:
         if not os.path.exists(work_path):
             raise TankError("Snapshot: Work file %s could not be found on disk!" % work_path)
-        
+
         # validate work file:
         if not self._work_template.validate(work_path):
             raise TankError("Unable to snapshot non-work file %s" % work_path)
-        
+
         # use work file to find fields for snapshot:
         fields = self._work_template.get_fields(work_path)
-        
+
         # add additional fields:
         fields["timestamp"] = datetime.now().strftime(Snapshot.TIMESTAMP_FMT)
         
         if "increment" in self._snapshot_template.keys:
             # work out next increment from existing snapshots:
             fields["increment"] = self._find_next_snapshot_increment({})
-        
+
         # generate snapshot path:
         snapshot_path = self._snapshot_template.apply_fields(fields)
-        
+
         # copy file via hook:
         self._app.log_debug("Snapshot: Copying %s --> %s" % (work_path, snapshot_path))
         self.copy_file(work_path, snapshot_path)
@@ -91,7 +90,7 @@ class Snapshot(object):
         if not os.path.exists(snapshot_path):
             raise TankError("Snapshot: Failed to copy work file from '%s' to '%s'" 
                             % (work_path, snapshot_path))
-        
+
         # ok, snapshot succeeded so update comment and thumbnail if we have them:
         self._add_snapshot_comment(snapshot_path, comment)
         if thumbnail:
@@ -291,6 +290,8 @@ class Snapshot(object):
         Triggered when user clicks 'Create Snapshot' button
         in the UI
         """
+        file_path = str(file_path) if file_path != None else None  # cast qstring -> str
+        
         # get data from widget:
         thumbnail = snapshot_widget.thumbnail
         comment = snapshot_widget.comment
@@ -322,6 +323,9 @@ class Snapshot(object):
         """
         Restore the specified snapshot
         """
+        current_path = str(current_path) if current_path != None else None  # cast qstring -> str
+        snapshot_path = str(snapshot_path) if snapshot_path != None else None  # cast qstring -> str
+        
         # double check that the current path is still correct - if 
         # it's not then something happened to change the current scene
         # this can happen because this isn't a modal dialog!

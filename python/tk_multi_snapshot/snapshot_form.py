@@ -66,7 +66,8 @@ class SnapshotForm(QtGui.QWidget):
         return self._ui.thumbnail_widget.thumbnail
     @property
     def comment(self):
-        return self._ui.comment_edit.toPlainText().rstrip()
+        # cast qstring -> str
+        return str(self._ui.comment_edit.toPlainText()).rstrip()
         
     def show_result(self, status, msg):
         """
