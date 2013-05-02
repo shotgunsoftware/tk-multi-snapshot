@@ -146,6 +146,10 @@ class Snapshot(object):
             # not a valid work file or snapshot!
             return history
         
+        # combine with context fields:
+        fields = dict(chain(self._app.context.as_template_fields(self._snapshot_template).iteritems(), fields.iteritems()))
+
+        
         # find files that match the snapshot template ignoring certain fields:
         files = self._app.tank.paths_from_template(self._snapshot_template, 
                                              fields, 
@@ -424,6 +428,9 @@ class Snapshot(object):
         snapshot_dir = os.path.dirname(snapshot_file_path)
         fields = self._snapshot_template.get_fields(snapshot_file_path)
         
+        # combine with context fields:
+        fields = dict(chain(self._app.context.as_template_fields(self._work_template).iteritems(), fields.iteritems()))
+        
         # always save with version = 0 so that comments for all
         # versions are saved in the same file.
         fields["version"] = 0 
@@ -446,6 +453,7 @@ class Snapshot(object):
             # look for old nuke style path:        
             snapshot_dir = os.path.dirname(snapshot_file_path)
             fields = self._snapshot_template.get_fields(snapshot_file_path)
+            
             SNAPSHOT_COMMENTS_FILE = r"%s_comments.yml"
             comments_file_name = SNAPSHOT_COMMENTS_FILE % fields.get("name", "unknown")
             comments_file_path = os.path.join(snapshot_dir, comments_file_name)
