@@ -6,6 +6,7 @@ import os
 import sys
 from datetime import datetime 
 import tempfile
+from itertools import chain
 
 import tank
 from tank import TankError
@@ -78,6 +79,8 @@ class Snapshot(object):
         if "increment" in self._snapshot_template.keys:
             # work out next increment from existing snapshots:
             fields["increment"] = self._find_next_snapshot_increment({})
+
+        fields = dict(chain(self._app.context.as_template_fields(self._snapshot_template).iteritems(), fields.iteritems()))
 
         # generate snapshot path:
         snapshot_path = self._snapshot_template.apply_fields(fields)
