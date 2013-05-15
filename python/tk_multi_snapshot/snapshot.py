@@ -98,6 +98,8 @@ class Snapshot(object):
         self._add_snapshot_comment(snapshot_path, comment)
         if thumbnail:
             self._add_snapshot_thumbnail(snapshot_path, thumbnail)
+
+        return snapshot_path
         
     def restore_snapshot(self, current_path, snapshot_path):
         """

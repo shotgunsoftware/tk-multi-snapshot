@@ -42,4 +42,4 @@ class MultiSnapshot(tank.platform.Application):
         Snapshots the current scene without any UI
         """
         work_path = self._handler.get_current_file_path()
-        self._handler.do_snapshot(work_path, thumbnail, comment)
+        return self._handler.do_snapshot(work_path, thumbnail, comment)
