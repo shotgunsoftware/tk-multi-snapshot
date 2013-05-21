@@ -180,13 +180,12 @@ class Ui_SnapshotForm(object):
         self.verticalLayout.addWidget(self.page_stack)
 
         self.retranslateUi(SnapshotForm)
-        self.page_stack.setCurrentIndex(0)
+        self.page_stack.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(SnapshotForm)
-        SnapshotForm.setTabOrder(self.comment_edit, self.thumbnail_widget)
-        SnapshotForm.setTabOrder(self.thumbnail_widget, self.cancel_btn)
+        SnapshotForm.setTabOrder(self.comment_edit, self.cancel_btn)
         SnapshotForm.setTabOrder(self.cancel_btn, self.snapshot_btn)
-        SnapshotForm.setTabOrder(self.snapshot_btn, self.history_btn)
-        SnapshotForm.setTabOrder(self.history_btn, self.close_btn)
+        SnapshotForm.setTabOrder(self.snapshot_btn, self.close_btn)
+        SnapshotForm.setTabOrder(self.close_btn, self.history_btn)
 
     def retranslateUi(self, SnapshotForm):
         SnapshotForm.setWindowTitle(QtGui.QApplication.translate("SnapshotForm", "Form", None, QtGui.QApplication.UnicodeUTF8))
