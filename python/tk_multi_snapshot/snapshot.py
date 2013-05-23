@@ -78,7 +78,7 @@ class Snapshot(object):
         
         if "increment" in self._snapshot_template.keys:
             # work out next increment from existing snapshots:
-            fields["increment"] = self._find_next_snapshot_increment({})
+            fields["increment"] = self._find_next_snapshot_increment(fields)
 
         fields = dict(chain(self._app.context.as_template_fields(self._snapshot_template).iteritems(), fields.iteritems()))
 
@@ -373,14 +373,18 @@ class Snapshot(object):
         self.show_snapshot_dlg()
    
     def _find_next_snapshot_increment(self, snapshot_fields):
-        # work out the snapshot directory and find all files
-        
-        # next, re-construct the work-file for each snapshot
-        
-        # match against the work_file we have
-        
-        # for all matching, find highest 'increment' number
-        pass
+        # Get list of existing snapshot paths
+        files = self._app.tank.paths_from_template(self._snapshot_template, 
+                                                   snapshot_fields, 
+                                                   ["timestamp", "increment"])
+
+        # Get maximum existing snapshot increment, defaulting to 0.
+        increment = 0
+        for f in files:
+            file_increment = self._snapshot_template.get_fields(f).get("increment", 0)
+            increment = max(file_increment, increment)
+
+        return increment + 1
         
     def _add_snapshot_thumbnail(self, snapshot_file_path, thumbnail):
         """
