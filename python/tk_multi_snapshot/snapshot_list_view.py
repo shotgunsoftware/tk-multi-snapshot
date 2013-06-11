@@ -51,16 +51,15 @@ class SnapshotListView(browser_widget.BrowserWidget):
         # group details by date
         details_by_date = {}
         for details in snapshot_details:
-            
             date = details.get("datetime")
             if date:
                 date = date.date()
             details_by_date.setdefault(date, list()).append(details)
             
-        # and sort by datetime within each day:
+        # and sort by (datetime, increment) within each day:
         from operator import attrgetter
         for items in details_by_date.values():
-            items.sort(key=lambda d:d.get("datetime"), reverse=True)
+            items.sort(key=lambda d:(d.get("datetime"), d.get("increment")), reverse=True)
         
         return details_by_date
     
