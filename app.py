@@ -16,27 +16,43 @@ class MultiSnapshot(tank.platform.Application):
         """
         Called as the application is being initialized
         """
-                
+
         tk_multi_snapshot = self.import_module("tk_multi_snapshot")
         self._handler = tk_multi_snapshot.Snapshot(self)
-      
+
         # validate templates:
         work_template = self.get_template("template_work")
         snapshot_template = self.get_template("template_snapshot")
-        
+
         # ensure snapshot template has at least one of increment or timestamp:
         if (not "timestamp" in snapshot_template.keys
             and not "increment" in snapshot_template.keys):
             self.log_error("'template_snapshot' must contain at least one of 'timestamp' or 'increment'")
             return
-      
+
         # register commands:
-        self.engine.register_command("Snapshot...", self._handler.show_snapshot_dlg)
-        self.engine.register_command("Snapshot History...", self._handler.show_snapshot_history_dlg)
-        
+        self.engine.register_command("Snapshot...", self.show_snapshot_dlg)
+        self.engine.register_command("Snapshot History...", self.show_snapshot_history_dlg)
+
     def destroy_app(self):
+        self._handler = None
         self.log_debug("Destroying tk-multi-snapshot")
-        
+
+    def show_snapshot_dlg(self):
+        """
+        Shows the Snapshot Dialog.
+        """
+        return self._handler.show_snapshot_dlg()
+
+    def show_snapshot_history_dlg(self):
+        self._handler.show_snapshot_history_dlg()
+
+    def can_snapshot(self, work_path=None):
+        """
+        Helper method to determine if a snapshot can be made with work_path.
+        """
+        return self._handler.can_snapshot(work_path)
+
     def snapshot(self, comment=None, thumbnail=None):
         """
         Snapshots the current scene without any UI
