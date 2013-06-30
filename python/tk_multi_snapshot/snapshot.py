@@ -280,12 +280,26 @@ class Snapshot(object):
         
         # show snapshot dialog as modal dialog:
         from .snapshot_form import SnapshotForm
-        (res, snapshot_widget) = self._app.engine.show_modal("Snapshot", self._app, SnapshotForm, work_file_path, thumbnail, self._setup_snapshot_ui)
+
+        # Check if tk-multi-workfiles is loaded and Save As is available.
+        can_save_as = False
+        workfiles_app = self._app.engine.apps.get("tk-multi-workfiles", None)
+        if workfiles_app:
+            # May not have a new enough version of tk-multi-workfiles so we
+            # need to wrap this in a try/except.
+            try:
+                can_save_as = workfiles_app.can_save_as()
+            except:
+                can_save_as = False
+
+        (res, snapshot_widget) = self._app.engine.show_modal("Snapshot", self._app, SnapshotForm, work_file_path, thumbnail, can_save_as, self._setup_snapshot_ui)
       
         # special case return code to show history dialog:
         if res == SnapshotForm.SHOW_HISTORY_RETURN_CODE:
             self.show_snapshot_history_dlg()
-
+        # special case return code to show save as dialog.
+        elif res == SnapshotForm.SHOW_SAVE_AS_RETURN_CODE:
+            workfiles_app.show_save_as_dlg()
         
     def _setup_snapshot_ui(self, snapshot_widget):
         """
