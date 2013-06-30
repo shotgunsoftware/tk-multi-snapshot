@@ -275,7 +275,7 @@ class Snapshot(object):
                   "%s\n\n"
                   "Unable to continue!" % e)
             QtGui.QMessageBox.critical(None, "Snapshot Error!", msg)
-            return
+            return 0
 
         # current scene path must match work template and contain version:
         if not work_file_path or not self._work_template.validate(work_file_path):
@@ -285,9 +285,9 @@ class Snapshot(object):
             # try to launch tank save-as command if we have it:
             tank_save_as_cmd = tank.platform.current_engine().commands.get("Tank Save As...")
             if tank_save_as_cmd:
-                tank_save_as_cmd["callback"]()
+                return tank_save_as_cmd["callback"]()
 
-            return
+            return 0
 
         # get initial thumbnail if there is one:
         thumbnail = QtGui.QPixmap(self._app.execute_hook("hook_thumbnail"))
@@ -300,6 +300,7 @@ class Snapshot(object):
         if res == SnapshotForm.SHOW_HISTORY_RETURN_CODE:
             self.show_snapshot_history_dlg()
 
+        return res
 
     def _setup_snapshot_ui(self, snapshot_widget):
         """
