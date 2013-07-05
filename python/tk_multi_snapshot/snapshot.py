@@ -30,24 +30,48 @@ class Snapshot(object):
         
         self._work_template = self._app.get_template("template_work")
         self._snapshot_template = self._app.get_template("template_snapshot")
+
+    def _do_scene_operation(self, operation, path=None, result_type=None):
+        """
+        Do the specified scene operation with the specified args
+        """
+        result = None
+        try:
+            result = self._app.execute_hook("hook_scene_operation", operation=operation, file_path=path)     
+        except TankError, e:
+            # deliberately filter out exception that used to be thrown 
+            # from the scene operation hook but has since been removed
+            if not str(e).startswith("Don't know how to perform scene operation '"):
+                # just re-raise the exception:
+                raise
+            
+        # validate the result if needed:
+        if result_type and (result == None or not isinstance(result, result_type)):
+            raise TankError("Unexpected type returned from 'hook_scene_operation' for operation '%s' - expected '%s' but returned '%s'" 
+                            % (operation, result_type.__name__, type(result).__name__))
+        
+        return result
         
     def save_current_file(self):
         """
         Use hook to save the current work/scene file
         """
-        self._app.execute_hook("hook_scene_operation", operation="save", file_path="")
+        self._app.log_debug("Saving the current file with hook")
+        self._do_scene_operation("save")
         
     def get_current_file_path(self):
         """
         Use hook to get the current work/scene file path
         """
-        return self._app.execute_hook("hook_scene_operation", operation="current_path", file_path="")
+        self._app.log_debug("Retrieving current scene path via hook")
+        return self._do_scene_operation("current_path", result_type=basestring)
 
     def open_file(self, file_path):
         """
         Use hook to open the specified file
         """
-        self._app.execute_hook("hook_scene_operation", operation="open", file_path=file_path)
+        self._app.log_debug("Opening file '%s' via hook" % file_path)
+        self._do_scene_operation("open", file_path)
         
     def copy_file(self, source_path, target_path):
         """
