@@ -69,5 +69,4 @@ class SceneOperation(Hook):
             # apparently bins can be without projects (child bins I think)
             raise Exception("Please select a Hiero Project!")
         
-        print "project %r" % project 
         return project
