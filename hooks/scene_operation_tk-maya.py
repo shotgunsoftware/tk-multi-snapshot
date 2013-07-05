@@ -44,5 +44,3 @@ class SceneOperation(Hook):
         elif operation == "save":
             # save the current scene:
             cmds.file(save=True)
-        else:
-            raise TankError("Don't know how to perform scene operation '%s'" % operation)

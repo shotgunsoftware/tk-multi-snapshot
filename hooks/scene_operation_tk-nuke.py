@@ -47,5 +47,3 @@ class SceneOperation(Hook):
         elif operation == "save":
             # save the current script:
             nuke.scriptSave()
-        else:
-            raise TankError("Don't know how to perform scene operation '%s'" % operation)

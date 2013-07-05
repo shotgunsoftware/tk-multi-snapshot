@@ -39,5 +39,3 @@ class SceneOperation(Hook):
             hou.hipFile.load(str(file_path))
         elif operation == "save":
             hou.hipFile.save()
-        else:
-            raise TankError("Don't know how to perform scene operation '%s'" % operation)
