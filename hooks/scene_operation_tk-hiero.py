@@ -42,7 +42,7 @@ class SceneOperation(Hook):
             # first close the current project then open the specified file 
             project = self._get_current_project()
             project.close()
-            hiero.core.openProject(file_path)
+            hiero.core.openProject(file_path.replace(os.path.sep, "/"))
 
         elif operation == "save":
             # save the current script:
