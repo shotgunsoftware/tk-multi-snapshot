@@ -73,6 +73,13 @@ class Snapshot(object):
         self._app.log_debug("Opening file '%s' via hook" % file_path)
         self._do_scene_operation("open", file_path)
         
+    def _reset_current_scene(self):
+        """
+        Use hook to clear the current scene
+        """
+        self._app.log_debug("Resetting the current scene via hook")
+        return self._do_scene_operation("reset") != False
+        
     def copy_file(self, source_path, target_path):
         """
         Use hook to copy source file to target path
@@ -145,6 +152,11 @@ class Snapshot(object):
             except:
                 # reformat error?
                 raise
+        
+        # reset the current scene in case the file is locked by being 
+        # open - Softimage does this!
+        if not self._reset_current_scene():
+            raise TankError("Failed to reset the scene!")
         
         # now use hook to copy snapshot back to work path:
         self._app.log_debug("Snapshot Restore: Copying %s --> %s" % (snapshot_path, current_path))
