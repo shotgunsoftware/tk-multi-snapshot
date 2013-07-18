@@ -64,17 +64,40 @@ class SceneOperation(Hook):
             Application.SaveScene()
 
         elif operation == "reset":
-            # reset the scene to an empty state
+            # reset the current scene - for snapshot this is only ever
+            # called when restoring from snapshot history prior to
+            # opening the restored scene
+            
+            # If the Solid Angle Arnold renderer is installed, Softimage will 
+            # crash if their OnEndNewScene event is not muted.  To avoid this 
+            # problem, lets find and Mute the event whilst we do the new.
+            arnold_event = None
+            event_info = Application.EventInfos
+            for event in event_info:
+                if event.Type == "OnEndNewScene" and event.Name == "SITOA_OnEndNewScene" and not event.Mute:
+                    arnold_event = event
+                    break
             try:
-                # The standard Softimage mechanism will check
-                # for and save the file if required
-                # Application.NewScene(project_path, Confirm)
+                if arnold_event:
+                    # Mute the arnold event
+                    self.parent.log_debug("Muting %s event..." % arnold_event.Name)
+                    arnold_event.Mute = True
+                    
+                # perform the new scene:
                 Application.NewScene("", True)
-            except com_error:
-                # exception here means the user hit 'Cancel'
+            except:
                 return False
             else:
                 return True
+            finally:
+                if arnold_event:
+                    self.parent.log_debug("Unmuting %s event..." % arnold_event.Name)
+                    arnold_event.Mute = False
+            
+            
+            
+            
+            
             
             
             
