@@ -61,6 +61,18 @@ class SceneOperation(Hook):
 
         elif operation == "open":
             # open the specified scene without any prompts
+            
+            # Redraw the UI
+            # Certain OnEndNewScene events can result in Softimage
+            # crashing if a scene is opened immediately after doing
+            # a new scene.  One such event is the Solid Andle Arnold
+            # renderer SITOA_OnEndNewScene event which sets some 
+            # viewport settings.
+            #
+            # Calling RedrawUI seems to force the events to complete
+            # before the open and therefore avoids the crash!
+            Application.Desktop.RedrawUI()
+            
             # Application.OpenScene(path, Confirm, ApplyAuxiliaryData)
             Application.OpenScene(file_path, False, False)
 
@@ -72,33 +84,13 @@ class SceneOperation(Hook):
             # reset the current scene - for snapshot this is only ever
             # called when restoring from snapshot history prior to
             # opening the restored scene
-            
-            # If the Solid Angle Arnold renderer is installed, Softimage will 
-            # crash if their OnEndNewScene event is not muted.  To avoid this 
-            # problem, lets find and Mute the event whilst we do the new.
-            arnold_event = None
-            event_info = Application.EventInfos
-            for event in event_info:
-                if event.Type == "OnEndNewScene" and event.Name == "SITOA_OnEndNewScene" and not event.Mute:
-                    arnold_event = event
-                    break
             try:
-                if arnold_event:
-                    # Mute the arnold event
-                    self.parent.log_debug("Muting %s event..." % arnold_event.Name)
-                    arnold_event.Mute = True
-                    
                 # perform the new scene:
                 Application.NewScene("", True)
             except:
                 return False
             else:
-                return True
-            finally:
-                if arnold_event:
-                    self.parent.log_debug("Unmuting %s event..." % arnold_event.Name)
-                    arnold_event.Mute = False
-            
+                return True           
             
             
             
