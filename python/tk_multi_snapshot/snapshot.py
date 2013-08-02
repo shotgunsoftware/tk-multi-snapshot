@@ -240,19 +240,53 @@ class Snapshot(object):
         """
         Get a nice display name for the snapshot history list
         """
-        display_name = ""
+        return self._get_file_display_name(path, self._work_template) or "Unknown"
 
-        fields = self._work_template.get_fields(path)
+    def _get_file_display_name(self, path, template):
+        """
+        Return the 'name' to be used for the file - if possible
+        this will return a 'versionless' name
+        """
+        # first, extract the fields from the path using the template:
+        fields = template.get_fields(path)
         if "name" in fields:
-            display_name = fields["name"]
-            
-        if not display_name:
-            # do something more clever with the file name:
-            fields["version"] = "v###"
-            versionless_path = self._work_template.apply_fields(fields)
-            display_name = os.path.basename(versionless_path)
-            
-        return display_name if display_name else "Unknown"
+            # well, that was easy!
+            return fields["name"]
+        
+        # find out if version is used in the file name:
+        template_name, _ = os.path.splitext(os.path.basename(template.definition))
+        version_in_name = "{version}" in template_name
+    
+        # build the path:
+        name, _ = os.path.splitext(os.path.basename(path))
+        if not version_in_name:
+            # ok, we can just use the file name
+            return name
+
+        # looks like version is part of the file name so we        
+        # need to isolate it so that we can remove it safely.  
+        # First, find a dummy version whose string representation
+        # doesn't exist in the name string
+        version_key = template.keys["version"]
+        dummy_version = 9876
+        while True:
+            test_str = version_key.str_from_value(dummy_version)
+            if test_str not in name:
+                break
+            dummy_version += 1
+        
+        # now use this dummy version and rebuild the path
+        fields["version"] = dummy_version
+        path = template.apply_fields(fields)
+        name, _ = os.path.splitext(os.path.basename(path))
+        
+        # now replace the dummy version with #'s:
+        dummy_version_str = version_key.str_from_value(dummy_version)
+        zero_version_str = version_key.str_from_value(0)        
+        new_version_str = "#" * len(zero_version_str)
+        name = name.replace(dummy_version_str, new_version_str)
+        
+        return name        
 
     def _get_file_last_modified_user(self, path):
         """
