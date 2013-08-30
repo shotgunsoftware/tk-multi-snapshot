@@ -396,8 +396,6 @@ class Snapshot(object):
         Triggered when user clicks 'Create Snapshot' button
         in the UI
         """
-        file_path = str(file_path) if file_path != None else None  # cast qstring -> str
-        
         # get data from widget:
         thumbnail = snapshot_widget.thumbnail
         comment = snapshot_widget.comment
@@ -429,9 +427,6 @@ class Snapshot(object):
         """
         Restore the specified snapshot
         """
-        current_path = str(current_path) if current_path != None else None  # cast qstring -> str
-        snapshot_path = str(snapshot_path) if snapshot_path != None else None  # cast qstring -> str
-        
         # double check that the current path is still correct - if 
         # it's not then something happened to change the current scene
         # this can happen because this isn't a modal dialog!

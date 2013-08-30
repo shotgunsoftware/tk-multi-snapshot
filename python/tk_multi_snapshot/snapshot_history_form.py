@@ -14,7 +14,7 @@ from tank.platform.qt import QtCore, QtGui
 
 class SnapshotHistoryForm(QtGui.QWidget):
     
-    restore = QtCore.Signal(str, str)
+    restore = QtCore.Signal(basestring, basestring)
     snapshot = QtCore.Signal()
     
     def __init__(self, app, handler, parent = None):
