@@ -27,12 +27,17 @@ class Snapshot(object):
     # Format of the timestamp used in snapshot files
     TIMESTAMP_FMT = "%Y-%m-%d-%H-%M-%S"
     
+    # cache of user details
+    _user_details_cache = {}
+    
     def __init__(self, app):
         """
         Construction
+        
+        Note, this class is shared between multiple commands so should be stateless
         """
         self._app = app
-        self._user_details_cache = {}
+        self._last_snapshot_result = None
         
         self._work_template = self._app.get_template("template_work")
         self._snapshot_template = self._app.get_template("template_snapshot")
@@ -92,10 +97,24 @@ class Snapshot(object):
         """
         self._app.execute_hook("hook_copy_file", source_path=source_path, target_path=target_path)
     
+    def can_snapshot(self, work_path=None):
+        """
+        Returns True if a snapshot can be created with work_path.
+        If work_path is None, the current_file_path is used.
+        """
+        work_path = work_path or self.get_current_file_path()
+        if not os.path.exists(work_path):
+            return False
+        if not self._work_template.validate(work_path):
+            return False
+        return True
+
     def do_snapshot(self, work_path, thumbnail, comment):
         """
         Do a snapshot using the specified details
         """
+        self._last_snapshot_result = None
+        
         # save the current scene:
         self.save_current_file()
 
@@ -135,7 +154,8 @@ class Snapshot(object):
         if thumbnail:
             self._add_snapshot_thumbnail(snapshot_path, thumbnail)
 
-        return snapshot_path
+        self._last_snapshot_result = snapshot_path
+        return self._last_snapshot_result
         
     def restore_snapshot(self, current_path, snapshot_path):
         """
@@ -331,7 +351,7 @@ class Snapshot(object):
         """
         Get the shotgun HumanUser entry:
         """
-        sg_user = self._user_details_cache.get(login_name)
+        sg_user = Snapshot._user_details_cache.get(login_name)
         if not sg_user:
             try:
                 filter = ["login", "is", login_name]
@@ -339,7 +359,7 @@ class Snapshot(object):
                 sg_user = self._app.shotgun.find_one("HumanUser", [filter], fields)
             except:
                 pass
-            self._user_details_cache[login_name] = sg_user
+            Snapshot._user_details_cache[login_name] = sg_user
         return sg_user
 
     def show_snapshot_dlg(self):
@@ -355,7 +375,7 @@ class Snapshot(object):
                   "%s\n\n"
                   "Unable to continue!" % e)
             QtGui.QMessageBox.critical(None, "Snapshot Error!", msg)
-            return
+            return False
         
         # current scene path must match work template and contain version:
         if not work_file_path or not self._work_template.validate(work_file_path):
@@ -369,20 +389,27 @@ class Snapshot(object):
                 save_as_cmd = tank.platform.current_engine().commands.get("Tank Save As...")
             if save_as_cmd:
                 save_as_cmd["callback"]()
-                
-            return
+
+            return False
         
         # get initial thumbnail if there is one:
         thumbnail = QtGui.QPixmap(self._app.execute_hook("hook_thumbnail"))
         
         # show snapshot dialog as modal dialog:
+        self._last_snapshot_result = None
+        
         from .snapshot_form import SnapshotForm
         (res, snapshot_widget) = self._app.engine.show_modal("Snapshot", self._app, SnapshotForm, work_file_path, thumbnail, self._setup_snapshot_ui)
+        
+        snapshot_success = (self._last_snapshot_result != None)
       
         # special case return code to show history dialog:
         if res == SnapshotForm.SHOW_HISTORY_RETURN_CODE:
+            # snapshot history dialog is modeless so this won't block!
             self.show_snapshot_history_dlg()
 
+        # return if snapshot was actually done
+        return snapshot_success
         
     def _setup_snapshot_ui(self, snapshot_widget):
         """
