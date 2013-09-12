@@ -76,7 +76,7 @@ class SnapshotHistoryForm(QtGui.QWidget):
         # make sure the snapshot list BrowserWidget is 
         # cleaned up properly
         self._ui.snapshot_list.destroy()
-        return QtGui.QWidget.closeEvent(self, e)
+        return QtGui.QWidget.closeEvent(self, event)
               
     def event(self, event):
         """
