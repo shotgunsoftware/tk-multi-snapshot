@@ -69,6 +69,14 @@ class SnapshotHistoryForm(QtGui.QWidget):
         # update the browser title:
         self._ui.snapshot_list.set_label(self._handler.get_history_display_name(self._path))
         
+    def closeEvent(self, event):
+        """
+        Called when the widget is closed.
+        """
+        # make sure the snapshot list BrowserWidget is 
+        # cleaned up properly
+        self._ui.snapshot_list.destroy()
+        event.accept()
               
     def event(self, event):
         """
