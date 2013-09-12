@@ -267,7 +267,15 @@ class Snapshot(object):
         this will return a 'versionless' name
         """
         # first, extract the fields from the path using the template:
-        fields = fields.copy() if fields else template.get_fields(path)
+        if fields:
+            fields = fields.copy()
+        else:
+            try:
+                fields = template.get_fields(path)
+            except TankError:
+                # template not valid for path!
+                return None
+
         if "name" in fields and fields["name"]:
             # well, that was easy!
             name = fields["name"]
