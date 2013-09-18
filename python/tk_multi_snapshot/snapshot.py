@@ -410,11 +410,14 @@ class Snapshot(object):
         (res, snapshot_widget) = self._app.engine.show_modal("Snapshot", self._app, SnapshotForm, work_file_path, thumbnail, self._setup_snapshot_ui)
         
         snapshot_success = (self._last_snapshot_result != None)
-      
+        
         # special case return code to show history dialog:
         if res == SnapshotForm.SHOW_HISTORY_RETURN_CODE:
             # snapshot history dialog is modeless so this won't block!
             self.show_snapshot_history_dlg()
+
+        # disconnect from the widget to allow the widget to be cleaned up:
+        snapshot_widget.snapshot.disconnect(self._do_snapshot_from_ui)
 
         # return if snapshot was actually done
         return snapshot_success
@@ -452,11 +455,23 @@ class Snapshot(object):
         Show the snapshot history UI for the current path
         """
         
-        # create dialog and hook up signals:
+        # create dialog:
         from .snapshot_history_form import SnapshotHistoryForm
         snapshot_history_form = self._app.engine.show_dialog("Snapshot History", self._app, SnapshotHistoryForm, self._app, self)
-        snapshot_history_form.restore.connect(lambda cp, sp, f=snapshot_history_form: self._on_history_restore_snapshot(f, cp, sp))
-        snapshot_history_form.snapshot.connect(lambda f=snapshot_history_form: self._on_history_do_snapshot(f))
+        
+        # hook up signals:
+        snapshot_history_form.restore.connect(self._on_history_restore_snapshot)
+        snapshot_history_form.snapshot.connect(self._on_history_do_snapshot)
+        snapshot_history_form.closed.connect(self._on_history_dlg_closed)
+ 
+    def _on_history_dlg_closed(self, widget):
+        """
+        Called when the history dialog is closed.  Hooks are 
+        disconnected to allow the widget to be released
+        """
+        widget.restore.disconnect(self._on_history_restore_snapshot)
+        widget.snapshot.disconnect(self._on_history_do_snapshot)
+        widget.closed.disconnect(self._on_history_dlg_closed)
  
     def _on_history_restore_snapshot(self, snapshot_history_form, current_path, snapshot_path):
         """

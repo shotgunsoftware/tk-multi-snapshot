@@ -14,8 +14,9 @@ from tank.platform.qt import QtCore, QtGui
 
 class SnapshotHistoryForm(QtGui.QWidget):
     
-    restore = QtCore.Signal(basestring, basestring)
-    snapshot = QtCore.Signal()
+    restore = QtCore.Signal(QtGui.QWidget, basestring, basestring)
+    snapshot = QtCore.Signal(QtGui.QWidget)
+    closed = QtCore.Signal(QtGui.QWidget)
     
     def __init__(self, app, handler, parent = None):
         """
@@ -76,6 +77,10 @@ class SnapshotHistoryForm(QtGui.QWidget):
         # make sure the snapshot list BrowserWidget is 
         # cleaned up properly
         self._ui.snapshot_list.destroy()
+        
+        # emit closed event:
+        self.closed.emit(self)
+        
         return QtGui.QWidget.closeEvent(self, event)
               
     def event(self, event):
@@ -91,10 +96,10 @@ class SnapshotHistoryForm(QtGui.QWidget):
         
     def _on_restore(self):
         path = self._ui.snapshot_list.get_selected_path()
-        self.restore.emit(self._path, path)
+        self.restore.emit(self, self._path, path)
         
     def _on_snapshot_btn_clicked(self):
-        self.snapshot.emit()
+        self.snapshot.emit(self)
         
     def _update_ui(self):
         can_restore = self._ui.snapshot_list.get_selected_item() != None
