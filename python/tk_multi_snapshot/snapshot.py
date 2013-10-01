@@ -534,12 +534,12 @@ class Snapshot(object):
         """
         if not thumbnail or thumbnail.isNull():
             return
-        
+
         # write out to tmp path:
-        temp_file = tempfile.NamedTemporaryFile(suffix=".png", prefix="tanktmp", delete=False)
-        temp_path = temp_file.name
-        temp_file.close()
-        
+        temp_file, temp_path = tempfile.mkstemp(suffix=".png", prefix="tanktmp")
+        if temp_file:
+            os.close(temp_file)
+
         try:
             if not thumbnail.save(temp_path, "PNG"):
                 raise TankError("Snapshot: Failed to save thumbnail to '%s'" % temp_path)

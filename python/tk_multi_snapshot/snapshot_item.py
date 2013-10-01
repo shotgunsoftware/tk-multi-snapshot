@@ -25,16 +25,17 @@ class SnapshotItem(browser_widget.ListItem):
         # tweak UI size:
         #self.geometry()
         
-    @property
-    def path(self):
+    # @property
+    def __get_path(self):
         """
         Property contains the file path for the snapshot
         it represents
         """
         return self._path
-    @path.setter
-    def path(self, value):
+    # @path.setter
+    def __set_path(self, value):
         self._path = value
+    path=property(__get_path, __set_path)
         
         
         
