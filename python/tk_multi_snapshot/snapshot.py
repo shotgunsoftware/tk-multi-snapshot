@@ -437,7 +437,9 @@ class Snapshot(object):
         # get data from widget:
         thumbnail = snapshot_widget.thumbnail
         comment = snapshot_widget.comment
-        
+
+        file_path = self._safe_to_string(file_path)
+
         # try to do the snapshot
         status = True
         msg = ""
@@ -472,7 +474,7 @@ class Snapshot(object):
         widget.restore.disconnect(self._on_history_restore_snapshot)
         widget.snapshot.disconnect(self._on_history_do_snapshot)
         widget.closed.disconnect(self._on_history_dlg_closed)
- 
+
     def _on_history_restore_snapshot(self, snapshot_history_form, current_path, snapshot_path):
         """
         Restore the specified snapshot
@@ -480,6 +482,10 @@ class Snapshot(object):
         # double check that the current path is still correct - if 
         # it's not then something happened to change the current scene
         # this can happen because this isn't a modal dialog!
+
+        current_path = self._safe_to_string(current_path)
+        snapshot_path = self._safe_to_string(snapshot_path)
+
         actual_current_path = self.get_current_file_path()
         if actual_current_path != current_path:
             snapshot_history_form.refresh()
@@ -681,9 +687,24 @@ class Snapshot(object):
                 comments[key] = value
             
         return comments        
-        
-        
-        
-        
-        
-        
+
+    def _safe_to_string(self, value):
+        """
+        safely convert the value to a string - handles
+        QtCore.QString if usign PyQt
+        """
+        #
+        if isinstance(value, basestring):
+            # it's a string anyway so just return
+            return value
+
+        if hasattr(QtCore, "QString"):
+            # running PyQt!
+            if isinstance(value, QtCore.QString):
+                # QtCore.QString inherits from str but supports
+                # unicode, go figure!  Lets play safe and return
+                # a utf-8 string
+                return str(value.toUtf8())
+
+        # For everything else, just return as string
+        return str(value)
