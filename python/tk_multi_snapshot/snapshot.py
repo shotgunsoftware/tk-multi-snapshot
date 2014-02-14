@@ -19,6 +19,8 @@ from tank import TankError
 from tank.platform.qt import QtCore, QtGui
 from tank_vendor import yaml
 
+from .string_utils import safe_to_string
+
 class Snapshot(object):
     """
     Main snapshot handler
@@ -438,7 +440,7 @@ class Snapshot(object):
         thumbnail = snapshot_widget.thumbnail
         comment = snapshot_widget.comment
 
-        file_path = self._safe_to_string(file_path)
+        file_path = safe_to_string(file_path)
 
         # try to do the snapshot
         status = True
@@ -483,8 +485,8 @@ class Snapshot(object):
         # it's not then something happened to change the current scene
         # this can happen because this isn't a modal dialog!
 
-        current_path = self._safe_to_string(current_path)
-        snapshot_path = self._safe_to_string(snapshot_path)
+        current_path = safe_to_string(current_path)
+        snapshot_path = safe_to_string(snapshot_path)
 
         actual_current_path = self.get_current_file_path()
         if actual_current_path != current_path:
@@ -632,7 +634,15 @@ class Snapshot(object):
         
     def _add_snapshot_comment(self, snapshot_file_path, comment):
         """
-        Added a comment to the comment file for a snapshot file.
+        Add a comment to the comment file for a snapshot file.  The comments are stored
+        in the following format:
+        
+        {<snapshot file name> : {
+            comment:    String - comment to store
+            sg_user:    Shotgun entity dictionary representing the user that created the snapshot
+            }
+         ...
+        }
 
         :param str file_path: path to the snapshot file.
         :param str comment: comment string to save.
@@ -682,29 +692,19 @@ class Snapshot(object):
             if isinstance(value, basestring):
                 # old style string
                 comments[key] = {"comment":value}
-            else:#if isinstance(value, dict):
+            elif isinstance(value, dict):
                 # new style dictionary
                 comments[key] = value
+            else:
+                # value isn't valid!
+                pass
+                
+        # ensure all comments are returned as utf-8 strings rather than
+        # unicode - this is due to a previous bug where the snapshot UI
+        # would return the comment as unicode!
+        for comment_dict in comments.values():
+            comment = comment_dict.get("comment")
+            if comment and isinstance(comment, unicode):
+                comment_dict["comment"] = comment.encode("utf8")
             
         return comments        
-
-    def _safe_to_string(self, value):
-        """
-        safely convert the value to a string - handles
-        QtCore.QString if usign PyQt
-        """
-        #
-        if isinstance(value, basestring):
-            # it's a string anyway so just return
-            return value
-
-        if hasattr(QtCore, "QString"):
-            # running PyQt!
-            if isinstance(value, QtCore.QString):
-                # QtCore.QString inherits from str but supports
-                # unicode, go figure!  Lets play safe and return
-                # a utf-8 string
-                return str(value.toUtf8())
-
-        # For everything else, just return as string
-        return str(value)
