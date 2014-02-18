@@ -11,6 +11,8 @@
 import tank
 from tank.platform.qt import QtCore, QtGui
 
+from .string_utils import safe_to_string
+
 thumbnail_widget = tank.platform.import_framework("tk-framework-widget", "thumbnail_widget")
 
 class ThumbnailWidget(thumbnail_widget.ThumbnailWidget):
@@ -73,7 +75,7 @@ class SnapshotForm(QtGui.QWidget):
     
     @property
     def comment(self):
-        return self._safe_to_string(self._ui.comment_edit.toPlainText()).rstrip()
+        return safe_to_string(self._ui.comment_edit.toPlainText()).rstrip()
         
     def show_result(self, status, msg):
         """
@@ -111,26 +113,5 @@ class SnapshotForm(QtGui.QWidget):
     def _on_show_history(self):
         self._exit_code = SnapshotForm.SHOW_HISTORY_RETURN_CODE
         self.close()
-        
-    def _safe_to_string(self, value):
-        """
-        safely convert the value to a string - handles
-        QtCore.QString if usign PyQt
-        """
-        #
-        if isinstance(value, basestring):
-            # it's a string anyway so just return
-            return value
-        
-        if hasattr(QtCore, "QString"):
-            # running PyQt!
-            if isinstance(value, QtCore.QString):
-                # QtCore.QString inherits from str but supports 
-                # unicode, go figure!  Lets play safe and return
-                # a utf-8 string
-                return str(value.toUtf8())
-        
-        # For everything else, just return as string
-        return str(value)
                 
     
