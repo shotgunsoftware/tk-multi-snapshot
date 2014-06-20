@@ -47,6 +47,9 @@ class SceneOperation(Hook):
             # first close the current project then open the specified file 
             project = self._get_current_project()
             project.close()
+            # manually fire signal since Hiero doesn't fire this when loading 
+            # from the tk file manager
+            hiero.core.events.sendEvent("kBeforeProjectLoad", None)
             hiero.core.openProject(file_path.replace(os.path.sep, "/"))
 
         elif operation == "save":
