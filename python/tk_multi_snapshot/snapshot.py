@@ -671,7 +671,11 @@ class Snapshot(object):
         comments[comments_key] = comments_value
         
         # and save yml file
-        yaml.dump(comments, open(comments_file_path, "w"))
+        old_umask = os.umask(0) 
+        try:
+            yaml.dump(comments, open(comments_file_path, "w"))
+        finally:
+            os.umask(old_umask) 
         
     
     def _get_snapshot_comments(self, snapshot_file_path):
