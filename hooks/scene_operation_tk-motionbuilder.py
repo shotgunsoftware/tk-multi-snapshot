@@ -22,7 +22,7 @@ class SceneOperation(Hook):
     current scene
     """
 
-    def execute(self, operation, file_path, context, parent_action, file_version, read_only, **kwargs):
+    def execute(self, operation, file_path, **kwargs):
         """
         Main hook entry point
         
