@@ -14,7 +14,7 @@ import tank
 from tank import Hook
 from tank import TankError
 
-import shotgunsupport
+import modoshotgunsupport
 
 class SceneOperation(Hook):
     """
@@ -40,8 +40,8 @@ class SceneOperation(Hook):
         """
         
         if operation == "current_path":
-            return shotgunsupport.get_scene_filename()
+            return modoshotgunsupport.get_scene_filename()
         elif operation == "open":
-            shotgunsupport.load_file(file_path)
+            modoshotgunsupport.load_file(file_path)
         elif operation == "save":
-            shotgunsupport.save_scene()
+            modoshotgunsupport.save_scene()
