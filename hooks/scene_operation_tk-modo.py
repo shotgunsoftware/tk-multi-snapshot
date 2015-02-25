@@ -19,7 +19,6 @@ import tank
 from tank import Hook
 from tank import TankError
 
-import modoshotgunsupport
 
 class SceneOperation(Hook):
     """
@@ -43,6 +42,7 @@ class SceneOperation(Hook):
                                      file path as a String
                     all others     - None
         """
+        import modoshotgunsupport
         
         if operation == "current_path":
             return modoshotgunsupport.get_scene_filename()
