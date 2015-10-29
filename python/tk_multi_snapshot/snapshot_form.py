@@ -85,6 +85,12 @@ class SnapshotForm(QtGui.QWidget):
         self._ui.status_title.setText(["Oh No, Something Went Wrong!", "Success!"][status])
         self._ui.status_details.setText([msg, "Snapshot Successfully Created"][not msg])
         self._ui.status_icon.setPixmap(QtGui.QPixmap([":/res/failure.png", ":/res/success.png"][status]))
+
+        # In later versions of Foundry software (like Hiero 9.0) we
+        # have issues with some scene operations forcing their window
+        # to the foreground, so we'll make sure to raise ours back
+        # in front.
+        self.window().raise_()
         
     def _on_comment_edit_key_pressed(self, default_func, event):
         """
