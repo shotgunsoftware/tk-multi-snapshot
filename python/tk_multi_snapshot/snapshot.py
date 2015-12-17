@@ -159,26 +159,27 @@ class Snapshot(object):
         self._last_snapshot_result = snapshot_path
         return self._last_snapshot_result
         
-    def restore_snapshot(self, current_path, snapshot_path):
+    def restore_snapshot(self, current_path, snapshot_path, snapshot_current=True):
         """
         Restore snapshot from the specified path
         """
         if not current_path or not snapshot_path:
             return
-        
+
         # to be on the safe side, save the current file
         # as it may be overidden:
         self.save_current_file()
-        
-        # check to see if work file exists and if it does, snapshot it first:
-        if os.path.exists(current_path):
-            try:
-                comment = ("Automatic snapshot before restoring older snapshot '%s'" 
-                            % os.path.basename(snapshot_path))
-                self.do_snapshot(current_path, None, comment)
-            except:
-                # reformat error?
-                raise
+
+        if snapshot_current:
+            # check to see if work file exists and if it does, snapshot it first:
+            if os.path.exists(current_path):
+                try:
+                    comment = ("Automatic snapshot before restoring older snapshot '%s'" 
+                               % os.path.basename(snapshot_path))
+                    self.do_snapshot(current_path, None, comment)
+                except:
+                    # reformat error?
+                    raise
         
         # reset the current scene in case the file is locked by being 
         # open - Softimage does this!
@@ -495,14 +496,15 @@ class Snapshot(object):
         
         # confirm snapshot restore:
         res = QtGui.QMessageBox.question(None,  "Restore Snapshot?", 
-                                         "A snapshot of the current work file will be made before restoring.\n\nContinue?", 
-                                         QtGui.QMessageBox.Ok | QtGui.QMessageBox.Cancel)
+                                         "Do you want to snapshot the current work file before restoring?", 
+                                         QtGui.QMessageBox.Yes | QtGui.QMessageBox.No | QtGui.QMessageBox.Cancel)
         if res == QtGui.QMessageBox.Cancel:
             return
-        
+
         # do snapshot restore
+        snapshot_current = (res == QtGui.QMessageBox.Yes)
         try:
-            self.restore_snapshot(current_path, snapshot_path)
+            self.restore_snapshot(current_path, snapshot_path, snapshot_current=snapshot_current)
         except TankError, e:
             QtGui.QMessageBox.critical(None, "Snapshot Restore Failed!", e)
             return
