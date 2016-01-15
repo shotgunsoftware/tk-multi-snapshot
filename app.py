@@ -35,6 +35,13 @@ class MultiSnapshot(tank.platform.Application):
         # register commands:
         self.engine.register_command("Snapshot...", self.show_snapshot_dlg)
         self.engine.register_command("Snapshot History...", self.show_snapshot_history_dlg)
+
+    @property
+    def context_change_allowed(self):
+        """
+        Specifies that context changes are allowed.
+        """
+        return True
         
     def destroy_app(self):
         self.tk_multi_snapshot = None
