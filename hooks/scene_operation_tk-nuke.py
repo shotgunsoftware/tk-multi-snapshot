@@ -50,7 +50,7 @@ class SceneOperation(Hook):
         """
         # Out of the box, we treat Nuke Studio just like Hiero, so we
         # can just call through here.
-        return self._hiero_execute(self, operation, file_path, **kwargs)
+        return self._hiero_execute(operation, file_path, **kwargs)
 
     def _hiero_execute(self, operation, file_path, **kwargs):
         """
