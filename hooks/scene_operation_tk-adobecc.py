@@ -9,10 +9,9 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 import os
-import photoshop
 
-from tank import Hook
-from tank import TankError
+from sgtk import Hook
+from sgtk import TankError
 
 class SceneOperation(Hook):
     """
@@ -36,39 +35,27 @@ class SceneOperation(Hook):
                                      file path as a String
                     all others     - None
         """
-        
+        adobe = self.parent.engine.adobe
+        doc = adobe.app.activeDocument
+
+        if not doc:
+            raise TankError("There is no active document!")
+
         if operation == "current_path":
             # return the current script path
-            
-            doc = self._get_active_document()
             if doc.fullName is None:
                 # not saved?
                 path = ""
             else:
                 path = doc.fullName.nativePath
-            
+
             return path
         
         elif operation == "open":
             # reopen the specified script
-            
-            doc = self._get_active_document()
-            doc.close()            
-            f = photoshop.RemoteObject('flash.filesystem::File', file_path)
-            photoshop.app.load(f)            
+            doc.close()
+            adobe.app.load(adobe.File(file_path))            
 
         elif operation == "save":
-            # save the current script:
-            doc = self._get_active_document()
+            # save the current script
             doc.save()
-
-
-    def _get_active_document(self):
-        """
-        Returns the currently open document in Photoshop.
-        Raises an exeption if no document is active.
-        """
-        doc = photoshop.app.activeDocument
-        if doc is None:
-            raise TankError("There is no currently active document!")
-        return doc
