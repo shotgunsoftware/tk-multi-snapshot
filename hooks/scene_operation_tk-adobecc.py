@@ -47,7 +47,7 @@ class SceneOperation(Hook):
                 # not saved?
                 path = ""
             else:
-                path = doc.fullName.nativePath
+                path = doc.fullName.fsName
 
             return path
         
