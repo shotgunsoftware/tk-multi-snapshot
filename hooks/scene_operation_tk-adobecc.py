@@ -43,11 +43,10 @@ class SceneOperation(Hook):
 
         if operation == "current_path":
             # return the current script path
-            if doc.fullName is None:
-                # not saved?
-                path = ""
-            else:
+            try:
                 path = doc.fullName.fsName
+            except RuntimeError:
+                raise TankError("The active document must be saved!")
 
             return path
         
