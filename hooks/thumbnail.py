@@ -104,7 +104,11 @@ class ThumbnailHook(Hook):
 
         with self.parent.engine.context_changes_disabled():
             try:
-                active_doc = adobe.app.activeDocument
+                try:
+                    active_doc = adobe.app.activeDocument
+                except RuntimeError:
+                    raise TankError("There is no active document!")
+
                 orig_name = active_doc.name
                 width_str = str(active_doc.width)
                 height_str = str(active_doc.height)

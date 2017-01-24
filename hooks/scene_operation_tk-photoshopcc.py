@@ -36,9 +36,10 @@ class SceneOperation(Hook):
                     all others     - None
         """
         adobe = self.parent.engine.adobe
-        doc = adobe.app.activeDocument
 
-        if not doc:
+        try:
+            doc = adobe.app.activeDocument
+        except RuntimeError:
             raise TankError("There is no active document!")
 
         if operation == "current_path":
