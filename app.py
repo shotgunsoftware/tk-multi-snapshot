@@ -33,8 +33,40 @@ class MultiSnapshot(tank.platform.Application):
             return
       
         # register commands:
-        self.engine.register_command("Snapshot...", self.show_snapshot_dlg)
-        self.engine.register_command("Snapshot History...", self.show_snapshot_history_dlg)
+
+        self.engine.register_command(
+            "Snapshot...",
+            self.show_snapshot_dlg,
+            {
+                # dark themed icon for engines that recognize this format
+                "icons": {
+                    "dark": {
+                        "png": os.path.join(
+                            os.path.dirname(__file__),
+                            "resources",
+                            "snapshot_menu_icon.png"
+                        )
+                    }
+                }
+            }
+        )
+
+        self.engine.register_command(
+            "Snapshot History...",
+            self.show_snapshot_history_dlg,
+            {
+                # dark themed icon for engines that recognize this format
+                "icons": {
+                    "dark": {
+                        "png": os.path.join(
+                            os.path.dirname(__file__),
+                            "resources",
+                            "snapshot_history_menu_icon.png"
+                        )
+                    }
+                }
+            }
+        )
 
     @property
     def context_change_allowed(self):
