@@ -37,16 +37,14 @@ class SceneOperation(Hook):
         """
         adobe = self.parent.engine.adobe
 
-        try:
-            doc = adobe.app.activeDocument
-        except RuntimeError:
+        doc = adobe.get_active_document()
+        if not doc:
             raise TankError("There is no active document!")
 
         if operation == "current_path":
             # return the current script path
-            try:
-                path = doc.fullName.fsName
-            except RuntimeError:
+            path = adobe.get_active_document_path()
+            if not path:
                 raise TankError("The active document must be saved!")
 
             return path
