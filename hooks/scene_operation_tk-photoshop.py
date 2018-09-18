@@ -60,7 +60,7 @@ class SceneOperation(Hook):
         elif operation == "save":
             # save the current script:
             doc = self._get_active_document()
-            doc.save()
+            photoshop.save_as(doc, doc.fullName.nativePath)
 
 
     def _get_active_document(self):
