@@ -375,7 +375,7 @@ class Snapshot(object):
         to modify the specified file
         """
         login_name = None
-        if sys.platform == "win32":
+        if tank.util.is_windows():
             # TODO: add windows support..
             pass
         else:
