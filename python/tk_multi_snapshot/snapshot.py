@@ -17,9 +17,11 @@ from itertools import chain
 import tank
 from tank import TankError
 from tank.platform.qt import QtCore, QtGui
-from tank_vendor import yaml
+from tank_vendor import yaml, six
 
-from .string_utils import safe_to_string
+shotgun_model = tank.platform.import_framework(
+    "tk-framework-shotgunutils", "shotgun_model"
+)
 
 
 class Snapshot(object):
@@ -82,7 +84,7 @@ class Snapshot(object):
         Use hook to get the current work/scene file path
         """
         self._app.log_debug("Retrieving current scene path via hook")
-        return self._do_scene_operation("current_path", result_type=basestring)
+        return self._do_scene_operation("current_path", result_type=six.string_types)
 
     def open_file(self, file_path):
         """
@@ -141,10 +143,8 @@ class Snapshot(object):
         fields = self._work_template.get_fields(work_path)
         fields = dict(
             chain(
-                self._app.context.as_template_fields(
-                    self._snapshot_template
-                ).iteritems(),
-                fields.iteritems(),
+                self._app.context.as_template_fields(self._snapshot_template).items(),
+                fields.items(),
             )
         )
 
@@ -237,10 +237,8 @@ class Snapshot(object):
         # combine with context fields:
         fields = dict(
             chain(
-                self._app.context.as_template_fields(
-                    self._snapshot_template
-                ).iteritems(),
-                fields.iteritems(),
+                self._app.context.as_template_fields(self._snapshot_template).items(),
+                fields.items(),
             )
         )
 
@@ -490,7 +488,7 @@ class Snapshot(object):
         thumbnail = snapshot_widget.thumbnail
         comment = snapshot_widget.comment
 
-        file_path = safe_to_string(file_path)
+        file_path = shotgun_model.get_sanitized_data(file_path)
 
         # try to do the snapshot
         status = True
@@ -540,8 +538,8 @@ class Snapshot(object):
         # it's not then something happened to change the current scene
         # this can happen because this isn't a modal dialog!
 
-        current_path = safe_to_string(current_path)
-        snapshot_path = safe_to_string(snapshot_path)
+        current_path = shotgun_model.get_sanitized_data(current_path)
+        snapshot_path = shotgun_modal.get_sanitized_data(snapshot_path)
 
         actual_current_path = self.get_current_file_path()
         if actual_current_path != current_path:
@@ -652,8 +650,8 @@ class Snapshot(object):
         # combine with context fields:
         fields = dict(
             chain(
-                self._app.context.as_template_fields(self._work_template).iteritems(),
-                fields.iteritems(),
+                self._app.context.as_template_fields(self._work_template).items(),
+                fields.items(),
             )
         )
 
@@ -685,16 +683,17 @@ class Snapshot(object):
 
             comments = {}
             if os.path.exists(comments_file_path):
-                raw_comments = yaml.load(open(comments_file_path, "r")) or {}
-                for (name, timestamp), comment in raw_comments.iteritems():
-                    fields["name"] = name
-                    fields["timestamp"] = timestamp
-                    snapshot_path = self._snapshot_template.apply_fields(fields)
+                with open(comments_file_path, "r") as fp:
+                    raw_comments = yaml.load(fp) or {}
+                    for (name, timestamp), comment in raw_comments.items():
+                        fields["name"] = name
+                        fields["timestamp"] = timestamp
+                        snapshot_path = self._snapshot_template.apply_fields(fields)
 
-                    if os.path.exists(snapshot_path):
-                        # add comment to dictionary in new style:
-                        comments_key = os.path.basename(snapshot_path)
-                        comments[comments_key] = {"comment": comment}
+                        if os.path.exists(snapshot_path):
+                            # add comment to dictionary in new style:
+                            comments_key = os.path.basename(snapshot_path)
+                            comments[comments_key] = {"comment": comment}
         except:
             # it's not critical that this succeeds so just ignore any exceptions
             pass
@@ -732,7 +731,8 @@ class Snapshot(object):
         # load yml file
         comments = {}
         if os.path.exists(comments_file_path):
-            comments = yaml.load(open(comments_file_path, "r")) or {}
+            with open(comments_file_path, "r") as fp:
+                comments = yaml.load(fp) or {}
 
         # comment is now a dictionary so that we can also include the user:
         comments_value = {"comment": comment, "sg_user": self._app.context.user}
@@ -744,7 +744,8 @@ class Snapshot(object):
         # and save yml file
         old_umask = os.umask(0)
         try:
-            yaml.dump(comments, open(comments_file_path, "w"))
+            with open(comments_file_path, "w") as fp:
+                yaml.dump(comments, fp)
         finally:
             os.umask(old_umask)
 
@@ -759,11 +760,12 @@ class Snapshot(object):
         comments_file_path = self._get_comments_file_path(snapshot_file_path)
         raw_comments = {}
         if os.path.exists(comments_file_path):
-            raw_comments = yaml.load(open(comments_file_path, "r")) or {}
+            with open(comments_file_path, "r") as fp:
+                raw_comments = yaml.load() or {}
 
         # process raw comments to convert old-style to new if need to:
-        for key, value in raw_comments.iteritems():
-            if isinstance(value, basestring):
+        for key, value in raw_comments.items():
+            if isinstance(value, six.string_types):
                 # old style string
                 comments[key] = {"comment": value}
             elif isinstance(value, dict):
@@ -778,7 +780,7 @@ class Snapshot(object):
         # would return the comment as unicode!
         for comment_dict in comments.values():
             comment = comment_dict.get("comment")
-            if comment and isinstance(comment, unicode):
-                comment_dict["comment"] = comment.encode("utf8")
+            if comment and isinstance(comment, six.text_type):
+                comment_dict["comment"] = six.ensure_str(comment)
 
         return comments

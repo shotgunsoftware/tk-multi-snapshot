@@ -85,7 +85,7 @@ class SnapshotListView(browser_widget.BrowserWidget):
             return
 
         # want to create groups of items in reverse date order
-        dates = result.keys()
+        dates = list(result)
         dates.sort(reverse=True)
 
         for date in dates:
