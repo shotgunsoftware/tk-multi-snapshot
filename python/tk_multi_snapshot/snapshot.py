@@ -84,7 +84,9 @@ class Snapshot(object):
         Use hook to get the current work/scene file path
         """
         self._app.log_debug("Retrieving current scene path via hook")
-        return self._do_scene_operation("current_path", result_type=six.string_types)
+        # six.string_types is a tuple, so grab the first item.
+        # On Python 2 that's basestring and Python 3 that is str.
+        return self._do_scene_operation("current_path", result_type=six.string_types[0])
 
     def open_file(self, file_path):
         """
@@ -488,7 +490,7 @@ class Snapshot(object):
         thumbnail = snapshot_widget.thumbnail
         comment = snapshot_widget.comment
 
-        file_path = shotgun_model.get_sanitized_data(file_path)
+        file_path = shotgun_model.sanitize_qt(file_path)
 
         # try to do the snapshot
         status = True
@@ -538,8 +540,8 @@ class Snapshot(object):
         # it's not then something happened to change the current scene
         # this can happen because this isn't a modal dialog!
 
-        current_path = shotgun_model.get_sanitized_data(current_path)
-        snapshot_path = shotgun_modal.get_sanitized_data(snapshot_path)
+        current_path = shotgun_model.sanitize_qt(current_path)
+        snapshot_path = shotgun_modal.sanitize_qt(snapshot_path)
 
         actual_current_path = self.get_current_file_path()
         if actual_current_path != current_path:
@@ -761,7 +763,7 @@ class Snapshot(object):
         raw_comments = {}
         if os.path.exists(comments_file_path):
             with open(comments_file_path, "r") as fp:
-                raw_comments = yaml.load() or {}
+                raw_comments = yaml.load(fp) or {}
 
         # process raw comments to convert old-style to new if need to:
         for key, value in raw_comments.items():

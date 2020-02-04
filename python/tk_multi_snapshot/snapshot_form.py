@@ -31,7 +31,7 @@ class SnapshotForm(QtGui.QWidget):
     """
 
     # signal emitted when user clicks the 'Create Snapshot' button
-    snapshot = QtCore.Signal(QtGui.QWidget, six.string_types)
+    snapshot = QtCore.Signal(QtGui.QWidget, str)
 
     SHOW_HISTORY_RETURN_CODE = 2
 
@@ -85,9 +85,7 @@ class SnapshotForm(QtGui.QWidget):
 
     @property
     def comment(self):
-        return shotgun_model.get_sanitized_data(
-            self._ui.comment_edit.toPlainText()
-        ).rstrip()
+        return shotgun_model.sanitize_qt(self._ui.comment_edit.toPlainText()).rstrip()
 
     def show_result(self, status, msg):
         """
