@@ -12,6 +12,7 @@ import os
 from datetime import datetime, timedelta
 
 import tank
+from tank import TankError
 from tank.platform.qt import QtCore, QtGui
 
 browser_widget = tank.platform.import_framework("tk-framework-widget", "browser_widget")

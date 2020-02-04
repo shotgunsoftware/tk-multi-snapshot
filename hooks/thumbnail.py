@@ -14,7 +14,7 @@ import uuid
 import re
 
 import tank
-from tank import Hook
+from tank import Hook, TankError
 
 
 class ThumbnailHook(Hook):
