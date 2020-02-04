@@ -541,7 +541,7 @@ class Snapshot(object):
         # this can happen because this isn't a modal dialog!
 
         current_path = shotgun_model.sanitize_qt(current_path)
-        snapshot_path = shotgun_modal.sanitize_qt(snapshot_path)
+        snapshot_path = shotgun_model.sanitize_qt(snapshot_path)
 
         actual_current_path = self.get_current_file_path()
         if actual_current_path != current_path:
