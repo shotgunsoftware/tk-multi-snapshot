@@ -66,3 +66,4 @@ supported_engines:
 # the frameworks required to run this app
 frameworks:
 - {"name": "tk-framework-widget", "version": "v0.2.x"}
+- {"name": "tk-framework-shotgunutils", "version": "v5.x.x"}
