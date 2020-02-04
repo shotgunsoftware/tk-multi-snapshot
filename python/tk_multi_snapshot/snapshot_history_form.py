@@ -10,7 +10,6 @@
 
 import os
 import tank
-from tank_vendor import six
 from tank.platform.qt import QtCore, QtGui
 
 

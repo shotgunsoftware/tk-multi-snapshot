@@ -9,7 +9,6 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 import tank
-from tank_vendor import six
 from tank.platform.qt import QtCore, QtGui
 
 shotgun_model = tank.platform.import_framework(
