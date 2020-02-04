@@ -51,7 +51,7 @@ class Snapshot(object):
         result = None
         try:
             result = self._app.execute_hook("hook_scene_operation", operation=operation, file_path=path)     
-        except TankError, e:
+        except TankError as e:
             # deliberately filter out exception that used to be thrown 
             # from the scene operation hook but has since been removed
             if not str(e).startswith("Don't know how to perform scene operation '"):
@@ -381,7 +381,7 @@ class Snapshot(object):
         # get current work file path:
         try:
             work_file_path = self.get_current_file_path()
-        except Exception, e:
+        except Exception as e:
             msg = ("Failed to get the current file path:\n\n"
                   "%s\n\n"
                   "Unable to continue!" % e)
@@ -448,7 +448,7 @@ class Snapshot(object):
         msg = ""
         try:
             self.do_snapshot(file_path, thumbnail, comment)
-        except Exception, e:
+        except Exception as e:
             status = False
             msg = "%s" % e
             
@@ -505,10 +505,10 @@ class Snapshot(object):
         snapshot_current = (res == QtGui.QMessageBox.Yes)
         try:
             self.restore_snapshot(current_path, snapshot_path, snapshot_current=snapshot_current)
-        except TankError, e:
+        except TankError as e:
             QtGui.QMessageBox.critical(None, "Snapshot Restore Failed!", e)
             return
-        except Exception, e:
+        except Exception as e:
             self._app.log_exception("Snapshot Restore Failed!")
             return
         

@@ -54,7 +54,7 @@ class SnapshotHistoryForm(QtGui.QWidget):
         self._path = None
         try:
             self._path = self._handler.get_current_file_path()
-        except Exception, e:
+        except Exception as e:
             # this only ever happens when the scene operation hook
             # throws an exception!
             msg = ("Failed to find the current work file path:\n\n"
