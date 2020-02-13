@@ -11,7 +11,9 @@
 import tank
 from tank.platform.qt import QtCore, QtGui
 
-from .string_utils import safe_to_string
+shotgun_model = tank.platform.import_framework(
+    "tk-framework-shotgunutils", "shotgun_model"
+)
 
 thumbnail_widget = tank.platform.import_framework(
     "tk-framework-widget", "thumbnail_widget"
@@ -28,7 +30,7 @@ class SnapshotForm(QtGui.QWidget):
     """
 
     # signal emitted when user clicks the 'Create Snapshot' button
-    snapshot = QtCore.Signal(QtGui.QWidget, basestring)
+    snapshot = QtCore.Signal(QtGui.QWidget, str)
 
     SHOW_HISTORY_RETURN_CODE = 2
 
@@ -82,7 +84,7 @@ class SnapshotForm(QtGui.QWidget):
 
     @property
     def comment(self):
-        return safe_to_string(self._ui.comment_edit.toPlainText()).rstrip()
+        return shotgun_model.sanitize_qt(self._ui.comment_edit.toPlainText()).rstrip()
 
     def show_result(self, status, msg):
         """
