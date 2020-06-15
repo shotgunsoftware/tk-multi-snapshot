@@ -23,7 +23,7 @@ class MultiSnapshot(tank.platform.Application):
         """
         Called as the application is being initialized
         """
-        
+
         # Ensure app isn't initialised in non-gui environments (eg a renderfarm)
         if not self.engine.has_ui:
             self.logger.debug(
