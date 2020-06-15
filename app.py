@@ -23,6 +23,14 @@ class MultiSnapshot(tank.platform.Application):
         """
         Called as the application is being initialized
         """
+
+        # Ensure app isn't initialised in non-gui environments (eg a renderfarm)
+        if not self.engine.has_ui:
+            self.logger.debug(
+                "The engine reports that there is no UI. Snapshot will not continue initializing."
+            )
+            return
+
         self.tk_multi_snapshot = self.import_module("tk_multi_snapshot")
 
         # ensure snapshot template has at least one of increment or timestamp:
