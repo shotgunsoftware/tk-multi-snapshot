@@ -430,10 +430,8 @@ class Snapshot(object):
             msg = "Unable to snapshot!\n\nPlease save the scene as a valid work file before continuing"
             QtGui.QMessageBox.information(None, "Unable To Snapshot!", msg)
 
-            # try to launch "Shotgun Save As" command if we have it:
-            save_as_cmd = tank.platform.current_engine().commands.get(
-                "Shotgun Save As..."
-            )
+            # try to launch "SG Save As" command if we have it:
+            save_as_cmd = tank.platform.current_engine().commands.get("SG Save As...")
             if not save_as_cmd:
                 # try old name, just in case
                 save_as_cmd = tank.platform.current_engine().commands.get(
