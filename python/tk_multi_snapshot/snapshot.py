@@ -431,7 +431,10 @@ class Snapshot(object):
             QtGui.QMessageBox.information(None, "Unable To Snapshot!", msg)
 
             # try to launch "SG Save As" command if we have it:
-            save_as_cmd = tank.platform.current_engine().commands.get("SG Save As...")
+            save_as_cmd = (
+                 tank.platform.current_engine().commands.get("SG Save As...") or
+                 tank.platform.current_engine().commands.get("Shotgun Save As...")
+            )
             if not save_as_cmd:
                 # try old name, just in case
                 save_as_cmd = tank.platform.current_engine().commands.get(
