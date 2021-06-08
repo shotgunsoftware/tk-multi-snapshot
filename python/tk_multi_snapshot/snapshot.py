@@ -432,7 +432,7 @@ class Snapshot(object):
 
             # try to launch "Shotgun Save As" command if we have it:
             save_as_cmd = tank.platform.current_engine().commands.get(
-                "Shotgun Save As..."
+                "ShotGrid Save As..."
             )
             if not save_as_cmd:
                 # try old name, just in case
