@@ -204,7 +204,7 @@ class Snapshot(object):
                     raise
 
         # reset the current scene in case the file is locked by being
-        # open - Softimage does this!
+        # open
         if not self._reset_current_scene():
             raise TankError("Failed to reset the scene!")
 
