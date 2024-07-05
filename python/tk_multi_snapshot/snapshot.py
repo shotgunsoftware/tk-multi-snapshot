@@ -17,7 +17,7 @@ from itertools import chain
 import tank
 from tank import TankError
 from tank.platform.qt import QtCore, QtGui
-from tank_vendor import yaml, six
+from tank_vendor import yaml, sgutils
 
 shotgun_model = tank.platform.import_framework(
     "tk-framework-shotgunutils", "shotgun_model"
@@ -84,9 +84,7 @@ class Snapshot(object):
         Use hook to get the current work/scene file path
         """
         self._app.log_debug("Retrieving current scene path via hook")
-        # six.string_types is a tuple, so grab the first item.
-        # On Python 2 that's basestring and Python 3 that is str.
-        return self._do_scene_operation("current_path", result_type=six.string_types[0])
+        return self._do_scene_operation("current_path", result_type=str)
 
     def open_file(self, file_path):
         """
@@ -767,7 +765,7 @@ class Snapshot(object):
 
         # process raw comments to convert old-style to new if need to:
         for key, value in raw_comments.items():
-            if isinstance(value, six.string_types):
+            if isinstance(value, str):
                 # old style string
                 comments[key] = {"comment": value}
             elif isinstance(value, dict):
@@ -782,7 +780,7 @@ class Snapshot(object):
         # would return the comment as unicode!
         for comment_dict in comments.values():
             comment = comment_dict.get("comment")
-            if comment and isinstance(comment, six.text_type):
-                comment_dict["comment"] = six.ensure_str(comment)
+            if comment and isinstance(comment, str):
+                comment_dict["comment"] = sgutils.ensure_str(comment)
 
         return comments
