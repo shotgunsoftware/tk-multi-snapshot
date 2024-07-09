@@ -17,7 +17,12 @@ from itertools import chain
 import tank
 from tank import TankError
 from tank.platform.qt import QtCore, QtGui
-from tank_vendor import yaml, sgutils
+from tank_vendor import yaml
+try:
+    from tank_vendor import sgutils
+except ImportError:
+    from tank_vendor import six as sgutils
+
 
 shotgun_model = tank.platform.import_framework(
     "tk-framework-shotgunutils", "shotgun_model"
