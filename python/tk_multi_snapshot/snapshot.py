@@ -18,6 +18,7 @@ import tank
 from tank import TankError
 from tank.platform.qt import QtCore, QtGui
 from tank_vendor import yaml
+
 try:
     from tank_vendor import sgutils
 except ImportError:
