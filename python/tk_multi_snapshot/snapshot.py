@@ -690,7 +690,7 @@ class Snapshot(object):
             comments = {}
             if os.path.exists(comments_file_path):
                 with open(comments_file_path, "r") as fp:
-                    raw_comments = yaml.load(fp) or {}
+                    raw_comments = yaml.load(fp, Loader=yaml.FullLoader) or {}
                     for (name, timestamp), comment in raw_comments.items():
                         fields["name"] = name
                         fields["timestamp"] = timestamp
@@ -738,7 +738,7 @@ class Snapshot(object):
         comments = {}
         if os.path.exists(comments_file_path):
             with open(comments_file_path, "r") as fp:
-                comments = yaml.load(fp) or {}
+                comments = yaml.load(fp, Loader=yaml.FullLoader) or {}
 
         # comment is now a dictionary so that we can also include the user:
         comments_value = {"comment": comment, "sg_user": self._app.context.user}
@@ -767,7 +767,7 @@ class Snapshot(object):
         raw_comments = {}
         if os.path.exists(comments_file_path):
             with open(comments_file_path, "r") as fp:
-                raw_comments = yaml.load(fp) or {}
+                raw_comments = yaml.load(fp, Loader=yaml.FullLoader) or {}
 
         # process raw comments to convert old-style to new if need to:
         for key, value in raw_comments.items():
