@@ -19,12 +19,6 @@ from tank import TankError
 from tank.platform.qt import QtCore, QtGui
 from tank_vendor import yaml
 
-try:
-    from tank_vendor import sgutils
-except ImportError:
-    from tank_vendor import six as sgutils
-
-
 shotgun_model = tank.platform.import_framework(
     "tk-framework-shotgunutils", "shotgun_model"
 )
@@ -787,6 +781,6 @@ class Snapshot(object):
         for comment_dict in comments.values():
             comment = comment_dict.get("comment")
             if comment and isinstance(comment, str):
-                comment_dict["comment"] = sgutils.ensure_str(comment)
+                comment_dict["comment"] = comment
 
         return comments
