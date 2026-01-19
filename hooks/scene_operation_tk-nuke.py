@@ -94,8 +94,10 @@ class SceneOperation(Hook):
             # open the specified script into the current window
             if nuke.root().modified():
                 raise TankError("Script is modified!")
-            nuke.scriptClear()
-            nuke.scriptOpen(file_path)
+            # See shotgunsoftware/tk-multi-snapshot/pull/23
+            for node in nuke.allNodes():
+                nuke.delete(node)
+            nuke.scriptReadFile(file_path)
         elif operation == "save":
             # save the current script:
             nuke.scriptSave()
