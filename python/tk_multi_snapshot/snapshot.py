@@ -450,7 +450,7 @@ class Snapshot(object):
 
         from .snapshot_form import SnapshotForm
 
-        (res, snapshot_widget) = self._app.engine.show_modal(
+        res, snapshot_widget = self._app.engine.show_modal(
             "Snapshot",
             self._app,
             SnapshotForm,
