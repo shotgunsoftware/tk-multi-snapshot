@@ -59,6 +59,7 @@ description: This app lets you quickly take a snapshot of the scene that you are
 requires_shotgun_version:
 requires_core_version: "v0.20.30"
 requires_engine_version:
+minimum_python_version: "3.9"
 
 # this app works in all engines - it does not contain any host application specific commands
 supported_engines:
