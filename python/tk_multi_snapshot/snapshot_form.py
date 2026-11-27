@@ -16,7 +16,7 @@ shotgun_model = tank.platform.import_framework(
 )
 
 thumbnail_widget = tank.platform.import_framework(
-    "tk-framework-widget", "thumbnail_widget"
+    "tk-framework-qtwidgets", "thumbnail_widget"
 )
 
 

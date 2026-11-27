@@ -66,5 +66,5 @@ supported_engines:
 
 # the frameworks required to run this app
 frameworks:
-- {"name": "tk-framework-widget", "version": "v0.2.x"}
+- {"name": "tk-framework-qtwidgets", "version": "v2.x.x", "minimum_version": "v2.13.0"}
 - {"name": "tk-framework-shotgunutils", "version": "v5.x.x"}

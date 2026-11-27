@@ -11,7 +11,9 @@
 import tank
 from tank.platform.qt import QtGui, QtCore
 
-browser_widget = tank.platform.import_framework("tk-framework-widget", "browser_widget")
+browser_widget = tank.platform.import_framework(
+    "tk-framework-qtwidgets", "browser_widget"
+)
 
 
 class SnapshotItem(browser_widget.ListItem):
